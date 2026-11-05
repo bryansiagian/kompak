@@ -1,0 +1,18 @@
+{
+  "name": "kompak",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build:shared": "pnpm --filter @kompak/shared build",
+    "dev": "pnpm build:shared && pnpm --parallel --filter @kompak/shared --filter web --filter api dev",
+    "build": "pnpm build:shared && pnpm -r --filter \"!@kompak/shared\" build",
+    "lint": "pnpm build:shared && pnpm -r --if-present lint",
+    "typecheck": "pnpm build:shared && pnpm -r --if-present typecheck",
+    "test": "pnpm build:shared && pnpm -r --if-present test",
+    "format": "prettier --write ."
+  }
+}
