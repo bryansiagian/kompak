@@ -17,10 +17,10 @@ These matter as much as code quality. When in doubt, choose the simpler option.
 - **Simplicity first.** A new user must reach value (create group, add task, invite teammates) in under 2 minutes with no tutorial. Do not add options, settings, or screens that power users would want but students would not.
 - **Mobile-first.** Design and test at 360px width first; touch targets at least 44px; drag and drop must work with touch and have a non-drag alternative (for example a "move to" menu).
 - **Indonesian UI.** All user-facing text is Indonesian: friendly, polite, no jargon. Strings live in message files (`apps/web/src/messages/id.json`), never hard-coded in components.
-- **Vocabulary mapping.** UI says *Kelompok* (workspace), *Proyek* (board), *Kolom* (list), *Tugas* (card), *Ketua* (OWNER), *Anggota* (MEMBER). Code, database, and API keep the technical names.
+- **Vocabulary mapping.** UI says _Kelompok_ (workspace), _Proyek_ (board), _Kolom_ (list), _Tugas_ (card), _Ketua_ (OWNER), _Anggota_ (MEMBER). Code, database, and API keep the technical names.
 - **Friendly feel.** Clear empty states, helpful microcopy, small celebratory feedback on completion. Keep animations light and respect `prefers-reduced-motion`.
 - **Share-friendly.** Joining a group happens through a link that works well when pasted into WhatsApp.
-- **Safe defaults.** New projects start with a default three-column template (*Belum dikerjakan*, *Sedang dikerjakan*, *Selesai*) so no one faces an empty screen.
+- **Safe defaults.** New projects start with a default three-column template (_Belum dikerjakan_, _Sedang dikerjakan_, _Selesai_) so no one faces an empty screen.
 
 ## Repository layout
 
@@ -62,17 +62,17 @@ pnpm --filter api prisma db seed                  # demo data
 pnpm dev                                          # run web + api in watch mode
 ```
 
-| Task | Command |
-|---|---|
-| Run everything in containers | `docker compose up --build` |
-| Lint | `pnpm lint` |
-| Typecheck | `pnpm typecheck` |
-| Unit tests | `pnpm test` |
-| API e2e tests | `pnpm --filter api test:e2e` |
-| Web e2e (Playwright) | `pnpm --filter web test:e2e` |
-| Format | `pnpm format` |
-| New migration | `pnpm --filter api prisma migrate dev --name <short_name>` |
-| Build all | `pnpm build` |
+| Task                         | Command                                                    |
+| ---------------------------- | ---------------------------------------------------------- |
+| Run everything in containers | `docker compose up --build`                                |
+| Lint                         | `pnpm lint`                                                |
+| Typecheck                    | `pnpm typecheck`                                           |
+| Unit tests                   | `pnpm test`                                                |
+| API e2e tests                | `pnpm --filter api test:e2e`                               |
+| Web e2e (Playwright)         | `pnpm --filter web test:e2e`                               |
+| Format                       | `pnpm format`                                              |
+| New migration                | `pnpm --filter api prisma migrate dev --name <short_name>` |
+| Build all                    | `pnpm build`                                               |
 
 Before finishing any task, run: `pnpm lint && pnpm typecheck && pnpm test`.
 
@@ -86,6 +86,7 @@ Variables without the `NEXT_PUBLIC_` prefix must never be read in browser code.
 ## Coding conventions
 
 ### General
+
 - TypeScript `strict` everywhere. No `any` unless justified with a comment. No `// @ts-ignore`.
 - Prefer small, pure functions. Isolate business logic from framework glue so it is unit-testable (e.g. card ordering in `cards/ordering.ts`).
 - Naming: `camelCase` for variables/functions, `PascalCase` for types/classes/components, `kebab-case` for file names, `SCREAMING_SNAKE_CASE` for env vars.
@@ -93,6 +94,7 @@ Variables without the `NEXT_PUBLIC_` prefix must never be read in browser code.
 - Comments explain **why**, not what.
 
 ### Backend (apps/api)
+
 - One NestJS module per domain. Controllers are thin: parse input, call a service, return a result.
 - All request bodies and params are validated with the Zod schemas from `packages/shared` (via a validation pipe).
 - Every route is authenticated by default. Public routes must be explicitly marked (e.g. `@Public()`).
@@ -104,6 +106,7 @@ Variables without the `NEXT_PUBLIC_` prefix must never be read in browser code.
 - Log with the Nest `Logger` (structured). Never log secrets, tokens, or full request bodies of auth routes.
 
 ### Frontend (apps/web)
+
 - Server data lives in TanStack Query. Do not duplicate it in local state.
 - Real-time events update the Query cache (`setQueryData`), they do not trigger full refetches unless necessary.
 - Card/list moves are optimistic with rollback on error.
@@ -115,6 +118,7 @@ Variables without the `NEXT_PUBLIC_` prefix must never be read in browser code.
 - Follow the "Product and UX principles" section above.
 
 ### Database
+
 - Schema changes only through Prisma migrations. Never edit an applied migration; add a new one.
 - Ordering uses fractional `position` (double). Use the shared ordering helper; do not hand-roll midpoint math in controllers.
 - Add an index for any new frequent filter or sort.

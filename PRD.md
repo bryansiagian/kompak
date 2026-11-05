@@ -13,6 +13,7 @@ Kompak is a simple, friendly, real-time collaboration web app for **university s
 ## 1.1 Problem and Context
 
 Many students at a university campus in Indonesia still coordinate group assignments through WhatsApp and Instagram chats. In practice this leads to:
+
 - Tasks and decisions buried in long chat threads.
 - Unclear ownership: nobody knows exactly who does what.
 - Missed or forgotten deadlines.
@@ -27,6 +28,7 @@ The author is part of the target audience, which allows early feedback from real
 ## 2. Goals and Non-Goals
 
 ### Goals
+
 - A working, publicly deployed app that a reviewer can try in under 2 minutes (demo account or quick sign-up).
 - Clean, readable, tested code with clear architecture documentation.
 - Real-time collaboration: two browsers on the same board stay in sync.
@@ -37,29 +39,32 @@ The author is part of the target audience, which allows early feedback from real
 - **Real usage:** classmates use it on a real assignment (validation, not just a demo).
 
 ### Non-Goals (MVP)
+
 - Mobile app, offline mode, file attachments, email notifications, billing, SSO/OAuth, integrations.
 - Enterprise features (audit export, SAML, granular custom roles).
 - Becoming a full Trello/Jira clone. Features that add complexity for power users are intentionally left out.
 
 ## 3. Target Users
 
-| Persona | Need |
-|---|---|
-| Student group member | Know what their tasks are and when they are due, update status in a few taps, mostly on a phone |
-| Group leader (*ketua kelompok*) | Create the group, split tasks fairly, see overall progress and who is behind |
-| Lecturer / teaching assistant (future, read-only) | See group progress without joining chats |
-| Recruiter / reviewer | Quickly evaluate the project's quality (README, demo, code) |
+| Persona                                           | Need                                                                                            |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Student group member                              | Know what their tasks are and when they are due, update status in a few taps, mostly on a phone |
+| Group leader (_ketua kelompok_)                   | Create the group, split tasks fairly, see overall progress and who is behind                    |
+| Lecturer / teaching assistant (future, read-only) | See group progress without joining chats                                                        |
+| Recruiter / reviewer                              | Quickly evaluate the project's quality (README, demo, code)                                     |
 
 ## 4. Functional Requirements
 
 Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 
 ### 4.1 Authentication (P0)
+
 - Register, login, logout with email and password.
 - Short-lived access token + rotating refresh token (httpOnly cookie).
 - Passwords hashed with argon2.
 
 ### 4.2 Workspaces and Members (P0)
+
 - A user can create multiple workspaces and is its `OWNER`.
 - Roles: `OWNER`, `ADMIN`, `MEMBER`.
   - OWNER: everything, including deleting the workspace.
@@ -68,9 +73,10 @@ Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 - Invite by shareable link or short join code (P0). The link can be pasted into WhatsApp; opening it prompts registration or login, then joins the group.
 - Invite an existing user by email (P1).
 
-> **UI vocabulary:** the interface avoids tool jargon. In Indonesian UI copy: Workspace = *Kelompok*, Board = *Proyek*, List = *Kolom*, Card = *Tugas*, `OWNER` = *Ketua*, `MEMBER` = *Anggota*. Code, database, and API keep the technical names.
+> **UI vocabulary:** the interface avoids tool jargon. In Indonesian UI copy: Workspace = _Kelompok_, Board = _Proyek_, List = _Kolom_, Card = _Tugas_, `OWNER` = _Ketua_, `MEMBER` = _Anggota_. Code, database, and API keep the technical names.
 
 ### 4.3 Boards, Lists, Cards (P0)
+
 - A workspace has many boards; a board has ordered lists; a list has ordered cards.
 - Card fields: title, description (markdown), assignee, due date, labels, position.
 - Create, edit, delete, archive cards and lists.
@@ -78,19 +84,24 @@ Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 - Ordering persists and is stable under concurrent edits.
 
 ### 4.4 Real-Time Collaboration (P0)
+
 - Changes (card created/updated/moved/deleted, comment added) appear on other viewers' screens within ~1 second without refresh.
 - Presence: show who is currently viewing the board (P1).
 
 ### 4.5 Comments and Activity (P1)
+
 - Threaded-free comments on cards (flat list), edit/delete own comment.
 - Activity log per card and per board (who did what, when).
 
 ### 4.6 Search and Filters (P1)
+
 - Filter board by assignee, label, due date.
 - Text search across cards in a workspace.
 
 ### 4.7 AI Features (P1)
+
 Implemented behind a small `AiService` so the provider can be swapped.
+
 - **Generate subtasks:** from a task's title and description (for example, the text of an assignment brief), propose a checklist of subtasks (structured JSON output); the user reviews and accepts. Especially useful for students who do not know how to break a big assignment into steps.
 - **Summarize discussion:** summarize a long comment thread into key points and decisions.
 - (P2) **Semantic search:** embeddings stored in PostgreSQL with pgvector.
@@ -98,7 +109,8 @@ Implemented behind a small `AiService` so the provider can be swapped.
 Constraints: API key stays on the server only; per-user rate limit; input length cap; AI output is always a suggestion the user confirms; graceful failure when the provider is down.
 
 ### 4.8 Student-Friendly Experience (P0 unless noted)
-- **Default template:** a new project starts with three columns, *Belum dikerjakan*, *Sedang dikerjakan*, *Selesai*, so users never face an empty board.
+
+- **Default template:** a new project starts with three columns, _Belum dikerjakan_, _Sedang dikerjakan_, _Selesai_, so users never face an empty board.
 - **Quick-add:** adding a task needs only a title; assignee and due date are optional.
 - **Guided onboarding:** a short first-run guide (3 to 4 steps) and a sample project to explore; skippable.
 - **Progress at a glance:** progress bar per project (done / total) and a "my tasks" view showing what is assigned to me and what is due soon.
@@ -111,33 +123,33 @@ Constraints: API key stays on the server only; per-user rate limit; input length
 
 ## 5. Non-Functional Requirements
 
-| Area | Requirement |
-|---|---|
-| Performance | Board with 200 cards loads in under 1.5s on a normal connection; API p95 under 300ms for typical reads |
-| Security | OWASP basics: input validation, parameterized queries (ORM), rate limiting on auth and AI endpoints, CORS allowlist, secure cookies, no secrets in repo |
-| Reliability | Database migrations are versioned; app starts cleanly with one command |
-| Accessibility | Keyboard-operable drag and drop alternative, semantic HTML, visible focus |
+| Area               | Requirement                                                                                                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Performance        | Board with 200 cards loads in under 1.5s on a normal connection; API p95 under 300ms for typical reads                                                                             |
+| Security           | OWASP basics: input validation, parameterized queries (ORM), rate limiting on auth and AI endpoints, CORS allowlist, secure cookies, no secrets in repo                            |
+| Reliability        | Database migrations are versioned; app starts cleanly with one command                                                                                                             |
+| Accessibility      | Keyboard-operable drag and drop alternative, semantic HTML, visible focus                                                                                                          |
 | Mobile and network | Mobile-first layout; usable at 360px width; touch targets at least 44px; acceptable on slow mobile connections; touch-friendly drag and drop with a non-drag "move to" alternative |
-| Localization | UI copy in Indonesian via message files (no hard-coded strings in components) |
-| Maintainability | TypeScript strict mode, linting, formatting, CI must pass before merge |
-| Observability | Structured logs, `/health` endpoint |
+| Localization       | UI copy in Indonesian via message files (no hard-coded strings in components)                                                                                                      |
+| Maintainability    | TypeScript strict mode, linting, formatting, CI must pass before merge                                                                                                             |
+| Observability      | Structured logs, `/health` endpoint                                                                                                                                                |
 
 ## 6. Tech Stack
 
-| Layer | Choice |
-|---|---|
-| Monorepo | pnpm workspaces |
-| Frontend | Next.js (App Router), React, TypeScript, Tailwind CSS, TanStack Query, dnd-kit |
-| Backend | NestJS, TypeScript, Prisma ORM, Socket.IO (WebSocket gateway) |
-| Localization | next-intl with Indonesian message files |
-| Validation | Zod schemas in a shared package (frontend and backend) |
-| Database | PostgreSQL (pgvector extension in P2) |
-| Auth | JWT access token + refresh token cookie, argon2 |
-| Testing | Jest (API unit + e2e), Vitest + Testing Library (web), Playwright (one happy-path e2e) |
-| Containers | Docker, Docker Compose |
-| CI/CD | GitHub Actions |
-| Deployment | AWS: ECR for images, App Runner (or EC2) for services, RDS PostgreSQL. Web may alternatively go on Vercel |
-| AI | LLM provider via server-side API (Anthropic Claude or equivalent), behind `AiService` |
+| Layer        | Choice                                                                                                    |
+| ------------ | --------------------------------------------------------------------------------------------------------- |
+| Monorepo     | pnpm workspaces                                                                                           |
+| Frontend     | Next.js (App Router), React, TypeScript, Tailwind CSS, TanStack Query, dnd-kit                            |
+| Backend      | NestJS, TypeScript, Prisma ORM, Socket.IO (WebSocket gateway)                                             |
+| Localization | next-intl with Indonesian message files                                                                   |
+| Validation   | Zod schemas in a shared package (frontend and backend)                                                    |
+| Database     | PostgreSQL (pgvector extension in P2)                                                                     |
+| Auth         | JWT access token + refresh token cookie, argon2                                                           |
+| Testing      | Jest (API unit + e2e), Vitest + Testing Library (web), Playwright (one happy-path e2e)                    |
+| Containers   | Docker, Docker Compose                                                                                    |
+| CI/CD        | GitHub Actions                                                                                            |
+| Deployment   | AWS: ECR for images, App Runner (or EC2) for services, RDS PostgreSQL. Web may alternatively go on Vercel |
+| AI           | LLM provider via server-side API (Anthropic Claude or equivalent), behind `AiService`                     |
 
 ## 7. Architecture
 
@@ -153,6 +165,7 @@ PostgreSQL (Prisma)
 ```
 
 Key design decisions:
+
 - **REST for writes, WebSocket for fan-out.** Clients mutate via REST; after a successful write the server emits an event to room `board:{boardId}`. Clients update the TanStack Query cache from those events.
 - **Optimistic UI for moves.** The client reorders immediately, then reconciles with the server response; on error it rolls back.
 - **Ordering with fractional positions.** Each list and card has a `position` (double precision). Inserting between A and B uses the midpoint; a background rebalance runs when gaps get too small. This avoids rewriting every row on each move.
@@ -182,33 +195,34 @@ Indexes: `Card(listId, position)`, `List(boardId, position)`, `WorkspaceMember(u
 
 ## 9. API Surface (REST, prefix `/api/v1`)
 
-| Area | Endpoints |
-|---|---|
-| Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` |
+| Area       | Endpoints                                                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Auth       | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`                                       |
 | Workspaces | `GET/POST /workspaces`, `GET/PATCH/DELETE /workspaces/:id`, `POST /workspaces/:id/members`, `PATCH/DELETE /workspaces/:id/members/:userId` |
-| Boards | `GET/POST /workspaces/:id/boards`, `GET/PATCH/DELETE /boards/:id` (GET returns lists + cards) |
-| Lists | `POST /boards/:id/lists`, `PATCH/DELETE /lists/:id`, `PATCH /lists/:id/move` |
-| Cards | `POST /lists/:id/cards`, `GET/PATCH/DELETE /cards/:id`, `PATCH /cards/:id/move` |
-| Comments | `GET/POST /cards/:id/comments`, `PATCH/DELETE /comments/:id` |
-| AI | `POST /cards/:id/ai/subtasks`, `POST /cards/:id/ai/summary` |
-| System | `GET /health` |
+| Boards     | `GET/POST /workspaces/:id/boards`, `GET/PATCH/DELETE /boards/:id` (GET returns lists + cards)                                              |
+| Lists      | `POST /boards/:id/lists`, `PATCH/DELETE /lists/:id`, `PATCH /lists/:id/move`                                                               |
+| Cards      | `POST /lists/:id/cards`, `GET/PATCH/DELETE /cards/:id`, `PATCH /cards/:id/move`                                                            |
+| Comments   | `GET/POST /cards/:id/comments`, `PATCH/DELETE /comments/:id`                                                                               |
+| AI         | `POST /cards/:id/ai/subtasks`, `POST /cards/:id/ai/summary`                                                                                |
+| System     | `GET /health`                                                                                                                              |
 
 ### WebSocket events (server → client)
+
 `card.created`, `card.updated`, `card.moved`, `card.deleted`, `list.created`, `list.updated`, `list.moved`, `comment.created`, `presence.updated`. Client joins with `board.join { boardId }` (authorized by membership).
 
 ## 10. Milestones
 
-| # | Milestone | Done when |
-|---|---|---|
-| M0 | Repo setup | Monorepo, Docker Compose (web, api, db), lint/format, CI skeleton, `/health` works |
-| M1 | Auth | Register/login/refresh/logout with tests; protected routes in web |
-| M2 | Groups (workspaces) and projects (boards) | CRUD with role guards; shareable invite link and join flow; member management |
-| M3 | Columns and tasks + DnD | Default three-column template; quick-add; create/edit/move with persisted ordering, optimistic UI, touch-friendly. **Show it to 3 to 5 classmates after this milestone** |
-| M4 | Real-time | Two browsers stay in sync; reconnect handling |
-| M5 | Comments, activity, filters | Comment CRUD, activity feed, filter bar |
-| M6 | AI features | Subtask generation and summary with rate limit and error handling |
-| M7 | Ship | Deployed publicly, seed/demo account, README with screenshots and architecture, e2e test in CI |
-| M8 | Pilot | 5 to 10 classmates use it for a real assignment; collect feedback; fix top issues; summarize results in the README |
+| #   | Milestone                                 | Done when                                                                                                                                                                |
+| --- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| M0  | Repo setup                                | Monorepo, Docker Compose (web, api, db), lint/format, CI skeleton, `/health` works                                                                                       |
+| M1  | Auth                                      | Register/login/refresh/logout with tests; protected routes in web                                                                                                        |
+| M2  | Groups (workspaces) and projects (boards) | CRUD with role guards; shareable invite link and join flow; member management                                                                                            |
+| M3  | Columns and tasks + DnD                   | Default three-column template; quick-add; create/edit/move with persisted ordering, optimistic UI, touch-friendly. **Show it to 3 to 5 classmates after this milestone** |
+| M4  | Real-time                                 | Two browsers stay in sync; reconnect handling                                                                                                                            |
+| M5  | Comments, activity, filters               | Comment CRUD, activity feed, filter bar                                                                                                                                  |
+| M6  | AI features                               | Subtask generation and summary with rate limit and error handling                                                                                                        |
+| M7  | Ship                                      | Deployed publicly, seed/demo account, README with screenshots and architecture, e2e test in CI                                                                           |
+| M8  | Pilot                                     | 5 to 10 classmates use it for a real assignment; collect feedback; fix top issues; summarize results in the README                                                       |
 
 Suggested pace: 1 to 1.5 weeks per milestone alongside coursework; M0 to M4 is already a strong portfolio piece.
 
@@ -224,14 +238,14 @@ Suggested pace: 1 to 1.5 weeks per milestone alongside coursework; M0 to M4 is a
 
 ## 12. Risks and Mitigations
 
-| Risk | Mitigation |
-|---|---|
-| Scope creep | Keep P2 items out until M7 is shipped |
-| Drag-and-drop ordering bugs | Isolate ordering logic in one pure function with unit tests |
-| Real-time race conditions | Server is source of truth; events carry `updatedAt`/version; client ignores stale events |
-| AI cost abuse on a public demo | Per-user rate limit, input caps, daily budget cap, feature flag |
-| Students do not adopt it | Keep scope tiny, mobile-first, WhatsApp share, test with real classmates early (after M3) and iterate |
-| Burnout / stalling | Ship vertical slices; every milestone leaves the app working |
+| Risk                           | Mitigation                                                                                            |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Scope creep                    | Keep P2 items out until M7 is shipped                                                                 |
+| Drag-and-drop ordering bugs    | Isolate ordering logic in one pure function with unit tests                                           |
+| Real-time race conditions      | Server is source of truth; events carry `updatedAt`/version; client ignores stale events              |
+| AI cost abuse on a public demo | Per-user rate limit, input caps, daily budget cap, feature flag                                       |
+| Students do not adopt it       | Keep scope tiny, mobile-first, WhatsApp share, test with real classmates early (after M3) and iterate |
+| Burnout / stalling             | Ship vertical slices; every milestone leaves the app working                                          |
 
 ## 13. Open Questions
 

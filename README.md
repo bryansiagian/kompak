@@ -32,16 +32,18 @@ Existing tools are built for professional teams and feel too complex for student
 ## Features
 
 **Core (MVP)**
+
 - Email and password authentication with refresh-token rotation
-- Groups (*Kelompok*) with roles: Ketua (owner) and Anggota (member)
+- Groups (_Kelompok_) with roles: Ketua (owner) and Anggota (member)
 - Join a group through a shareable link, with a one-tap "share to WhatsApp" button
-- Projects (*Proyek*) with columns and tasks (*Tugas*), using a default *Belum dikerjakan / Sedang dikerjakan / Selesai* template
+- Projects (_Proyek_) with columns and tasks (_Tugas_), using a default _Belum dikerjakan / Sedang dikerjakan / Selesai_ template
 - Drag and drop to reorder and move tasks, with touch support and a non-drag alternative
 - Real-time sync: changes appear on other members' screens within about a second
 - Task details: description, assignee, due date, labels
 - Mobile-first, Indonesian UI
 
 **Planned**
+
 - Comments and activity log
 - "My tasks" view, progress bar, and deadline states
 - Contribution summary per member
@@ -52,18 +54,18 @@ The full list with priorities is in [PRD.md](./PRD.md).
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Monorepo | pnpm workspaces |
+| Layer    | Technology                                                                                |
+| -------- | ----------------------------------------------------------------------------------------- |
+| Monorepo | pnpm workspaces                                                                           |
 | Frontend | Next.js (App Router), React, TypeScript, Tailwind CSS, TanStack Query, dnd-kit, next-intl |
-| Backend | NestJS, TypeScript, Prisma, Socket.IO |
-| Database | PostgreSQL |
-| Shared | Zod schemas (`packages/shared`) used by both frontend and backend |
-| Auth | JWT access token + httpOnly refresh cookie, argon2 |
-| Testing | Jest, Vitest, Testing Library, Playwright |
-| DevOps | Docker, Docker Compose, GitHub Actions |
-| Cloud | AWS (ECR, App Runner, RDS) |
-| AI | LLM provider accessed server-side through an `AiService` |
+| Backend  | NestJS, TypeScript, Prisma, Socket.IO                                                     |
+| Database | PostgreSQL                                                                                |
+| Shared   | Zod schemas (`packages/shared`) used by both frontend and backend                         |
+| Auth     | JWT access token + httpOnly refresh cookie, argon2                                        |
+| Testing  | Jest, Vitest, Testing Library, Playwright                                                 |
+| DevOps   | Docker, Docker Compose, GitHub Actions                                                    |
+| Cloud    | AWS (ECR, App Runner, RDS)                                                                |
+| AI       | LLM provider accessed server-side through an `AiService`                                  |
 
 ## Architecture
 
@@ -120,26 +122,26 @@ pnpm dev                                     # web + api in watch mode
 
 ### Useful commands
 
-| Task | Command |
-|---|---|
-| Lint | `pnpm lint` |
-| Typecheck | `pnpm typecheck` |
-| Unit tests | `pnpm test` |
+| Task          | Command                      |
+| ------------- | ---------------------------- |
+| Lint          | `pnpm lint`                  |
+| Typecheck     | `pnpm typecheck`             |
+| Unit tests    | `pnpm test`                  |
 | API e2e tests | `pnpm --filter api test:e2e` |
 | Web e2e tests | `pnpm --filter web test:e2e` |
-| Build | `pnpm build` |
+| Build         | `pnpm build`                 |
 
 ### Environment variables
 
 Copy `.env.example` to `.env`. Never commit your real `.env`.
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | Token signing secrets |
-| `COOKIE_DOMAIN`, `CORS_ORIGIN` | Cookie and CORS settings |
+| Variable                                    | Purpose                                    |
+| ------------------------------------------- | ------------------------------------------ |
+| `DATABASE_URL`                              | PostgreSQL connection string               |
+| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`   | Token signing secrets                      |
+| `COOKIE_DOMAIN`, `CORS_ORIGIN`              | Cookie and CORS settings                   |
 | `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WS_URL` | API and WebSocket URLs used by the browser |
-| `AI_API_KEY`, `AI_MODEL`, `AI_DAILY_BUDGET` | AI provider settings (server-side only) |
+| `AI_API_KEY`, `AI_MODEL`, `AI_DAILY_BUDGET` | AI provider settings (server-side only)    |
 
 ## Project Structure
 
@@ -162,7 +164,7 @@ Copy `.env.example` to `.env`. Never commit your real `.env`.
 - [ ] **M0** Repository setup: monorepo, Docker Compose, CI skeleton, health check
 - [ ] **M1** Authentication
 - [ ] **M2** Groups and projects, invite link and join flow
-- [ ] **M3** Columns and tasks with drag and drop *(first test with classmates)*
+- [ ] **M3** Columns and tasks with drag and drop _(first test with classmates)_
 - [ ] **M4** Real-time collaboration
 - [ ] **M5** Comments, activity log, filters
 - [ ] **M6** AI features
