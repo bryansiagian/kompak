@@ -4,7 +4,9 @@ WORKDIR /app
 
 COPY . .
 RUN pnpm install --frozen-lockfile --filter api...
-RUN pnpm --filter @kompak/shared build && pnpm --filter api build
+RUN pnpm --filter @kompak/shared build \
+  && pnpm --filter api generate \
+  && pnpm --filter api build
 
 ENV NODE_ENV=production
 EXPOSE 4000

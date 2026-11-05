@@ -8,13 +8,14 @@
   },
   "scripts": {
     "build:shared": "pnpm --filter @kompak/shared build",
-    "dev": "pnpm build:shared && pnpm --parallel --filter @kompak/shared --filter web --filter api dev",
-    "build": "pnpm build:shared && pnpm -r --filter \"!@kompak/shared\" build",
-    "lint": "pnpm build:shared && pnpm -r --if-present lint",
-    "typecheck": "pnpm build:shared && pnpm -r --if-present typecheck",
-    "test": "pnpm build:shared && pnpm -r --if-present test",
+    "generate": "pnpm --filter api generate",
+    "dev": "pnpm build:shared && pnpm generate && pnpm --parallel --filter @kompak/shared --filter web --filter api dev",
+    "build": "pnpm build:shared && pnpm generate && pnpm -r --filter \"!@kompak/shared\" build",
+    "lint": "pnpm build:shared && pnpm generate && pnpm -r --if-present lint",
+    "typecheck": "pnpm build:shared && pnpm generate && pnpm -r --if-present typecheck",
+    "test": "pnpm build:shared && pnpm generate && pnpm -r --if-present test",
     "format": "prettier --write ."
-  },
+    },
   "devDependencies": {
     "prettier": "^3.9.10"
   }
