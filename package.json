@@ -14,5 +14,8 @@
     "typecheck": "pnpm build:shared && pnpm -r --if-present typecheck",
     "test": "pnpm build:shared && pnpm -r --if-present test",
     "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10"
   }
 }
