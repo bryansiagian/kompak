@@ -161,7 +161,7 @@ Copy `.env.example` to `.env`. Never commit your real `.env`.
 
 ## Roadmap
 
-- [ ] **M0** Repository setup: monorepo, Docker Compose, CI skeleton, health check
+- [x] **M0** Repository setup: monorepo, Docker Compose, CI skeleton, health check
 - [ ] **M1** Authentication
 - [ ] **M2** Groups and projects, invite link and join flow
 - [ ] **M3** Columns and tasks with drag and drop _(first test with classmates)_
