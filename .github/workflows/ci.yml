@@ -12,6 +12,28 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: kompak
+          POSTGRES_PASSWORD: kompak
+          POSTGRES_DB: kompak
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kompak -d kompak"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://kompak:kompak@localhost:5432/kompak
+      JWT_ACCESS_SECRET: ci-access-secret-not-for-production
+      JWT_REFRESH_SECRET: ci-refresh-secret-not-for-production
+      CORS_ORIGIN: http://localhost:3000
+
     steps:
       - uses: actions/checkout@v4
 
@@ -30,3 +52,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+
+      - run: pnpm --filter api migrate:deploy
+      - run: pnpm test:e2e
