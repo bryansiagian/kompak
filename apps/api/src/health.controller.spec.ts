@@ -1,12 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
-import type { HealthResponse } from '@kompak/shared';
-import { Public } from './common/decorators/public.decorator';
+import { HealthController } from './health.controller';
 
-@Public()
-@Controller('health')
-export class HealthController {
-  @Get()
-  check(): HealthResponse {
-    return { status: 'ok' };
-  }
-}
+describe('HealthController', () => {
+  it('mengembalikan status ok', () => {
+    const controller = new HealthController();
+    expect(controller.check()).toEqual({ status: 'ok' });
+  });
+});
