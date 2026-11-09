@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "title": "Kompak",
+    "description": "Tugas kelompok jadi lebih kompak. Bagi tugas, pantau progres, semua dari HP."
+  },
+  "common": {
+    "appName": "Kompak",
+    "tagline": "Tugas kelompok jadi lebih kompak.",
+    "loading": "Sebentar ya…",
+    "logout": "Keluar",
+    "loggingOut": "Sedang keluar…"
+  },
+  "auth": {
+    "login": {
+      "title": "Masuk ke Kompak",
+      "subtitle": "Lanjutkan tugas kelompokmu.",
+      "submit": "Masuk",
+      "submitting": "Sedang masuk…",
+      "switchText": "Belum punya akun?",
+      "switchLink": "Daftar dulu"
+    },
+    "register": {
+      "title": "Buat akun Kompak",
+      "subtitle": "Gratis, dan cuma butuh satu menit.",
+      "submit": "Daftar",
+      "submitting": "Sedang mendaftar…",
+      "switchText": "Sudah punya akun?",
+      "switchLink": "Masuk"
+    },
+    "fields": {
+      "email": "Email",
+      "name": "Nama",
+      "password": "Kata sandi",
+      "passwordHint": "Minimal 8 karakter."
+    },
+    "errors": {
+      "emailInvalid": "Email belum benar. Coba cek lagi ya.",
+      "nameRequired": "Nama jangan dikosongkan ya.",
+      "passwordMin": "Kata sandi minimal 8 karakter.",
+      "passwordRequired": "Isi kata sandimu dulu ya.",
+      "emailTaken": "Email ini sudah terdaftar. Coba masuk saja.",
+      "invalidCredentials": "Email atau kata sandi belum cocok. Coba lagi ya.",
+      "tooManyRequests": "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.",
+      "network": "Tidak bisa terhubung ke server. Cek koneksimu lalu coba lagi.",
+      "generic": "Ada yang tidak beres. Coba lagi sebentar lagi ya."
+    }
+  },
+  "home": {
+    "greeting": "Halo, {name}!",
+    "intro": "Kamu sudah masuk. Kelompok dan tugasmu akan muncul di sini."
+  }
+}
