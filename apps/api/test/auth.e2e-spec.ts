@@ -132,19 +132,33 @@ describe('Auth (e2e)', () => {
     await request(app.getHttpServer()).get('/health').expect(200);
   });
 
-  it('GET /auth/me butuh access token yang valid', async () => {
+      it('GET /auth/me butuh access token yang valid', async () => {
     const server = app.getHttpServer();
-    await request(server).get(`${AUTH_PATH}/me`).expect(401);
-    await request(server)
+
+    const missing = await request(server).get(`${AUTH_PATH}/me`).expect(401);
+    expect((missing.body as { message: string }).message).toBe(
+      'Missing access token',
+    );
+
+    // Pesan ini hanya dilempar guard, jadi membuktikan guard global aktif.
+    const invalid = await request(server)
       .get(`${AUTH_PATH}/me`)
       .set('Authorization', 'Bearer token-ngawur')
       .expect(401);
+    expect((invalid.body as { message: string }).message).toBe(
+      'Invalid or expired access token',
+    );
 
     const { body } = await login();
     const res = await request(server)
       .get(`${AUTH_PATH}/me`)
-      .set('Authorization', `Bearer ${body.accessToken}`)
-      .expect(200);
+      .set('Authorization', `Bearer ${body.accessToken}`);
+
+    // Dibandingkan sebagai objek agar pesan error ikut terlihat saat gagal.
+    expect({ status: res.status, body: res.body }).toMatchObject({
+      status: 200,
+      body: { email },
+    });
     expect((res.body as AuthUser).email).toBe(email);
   });
 
