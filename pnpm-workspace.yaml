@@ -4,4 +4,5 @@ packages:
 allowBuilds:
   '@parcel/watcher': false
   '@prisma/engines': true
+  '@swc/core': set this to true or false
   prisma: true
