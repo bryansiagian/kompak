@@ -1,25 +1,95 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import type { Request, Response } from 'express';
 import { loginSchema, registerSchema } from '@kompak/shared';
-import type { AuthResponse, LoginInput, RegisterInput } from '@kompak/shared';
+import type {
+  AuthResponse,
+  AuthUser,
+  LoginInput,
+  RegisterInput,
+} from '@kompak/shared';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Public } from '../../common/decorators/public.decorator';
+import { RateLimit, RateLimitGuard } from '../../common/guards/rate-limit.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+import type { AuthenticatedUser } from '../../common/types/authenticated-request';
 import { AuthService } from './auth.service';
+import {
+  clearRefreshCookie,
+  readRefreshCookie,
+  setRefreshCookie,
+} from './refresh-cookie';
+
+const ONE_MINUTE_MS = 60_000;
 
 @Controller('auth')
+@UseGuards(RateLimitGuard)
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
+  @Public()
+  @RateLimit({ limit: 10, windowMs: ONE_MINUTE_MS })
   @Post('register')
-  register(
+  async register(
     @Body(new ZodValidationPipe(registerSchema)) body: RegisterInput,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponse> {
-    return this.auth.register(body);
+    const { auth, refreshToken } = await this.auth.register(body);
+    setRefreshCookie(res, refreshToken);
+    return auth;
   }
 
+  @Public()
+  @RateLimit({ limit: 10, windowMs: ONE_MINUTE_MS })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  login(
+  async login(
     @Body(new ZodValidationPipe(loginSchema)) body: LoginInput,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponse> {
-    return this.auth.login(body);
+    const { auth, refreshToken } = await this.auth.login(body);
+    setRefreshCookie(res, refreshToken);
+    return auth;
+  }
+
+  @Public()
+  @RateLimit({ limit: 30, windowMs: ONE_MINUTE_MS })
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponse> {
+    const { auth, refreshToken } = await this.auth.refresh(
+      readRefreshCookie(req),
+    );
+    setRefreshCookie(res, refreshToken);
+    return auth;
+  }
+
+  // Publik agar logout tetap bisa dilakukan saat access token sudah kedaluwarsa.
+  @Public()
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    await this.auth.logout(readRefreshCookie(req));
+    clearRefreshCookie(res);
+  }
+
+  @Get('me')
+  me(@CurrentUser() user: AuthenticatedUser): Promise<AuthUser> {
+    return this.auth.me(user.id);
   }
 }
