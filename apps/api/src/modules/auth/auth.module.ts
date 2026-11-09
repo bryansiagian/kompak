@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { ACCESS_TOKEN_TTL_SECONDS } from './auth.constants';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-
-const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, { provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AuthModule {}
