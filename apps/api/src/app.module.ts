@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { HealthController } from './health.controller';
 import { AuthModule } from './modules/auth/auth.module';
+import { BoardsModule } from './modules/boards/boards.module';
+import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -13,6 +15,8 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     PrismaModule,
     AuthModule,
+    WorkspacesModule,
+    BoardsModule,
   ],
   controllers: [HealthController],
 })
