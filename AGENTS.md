@@ -17,7 +17,7 @@ These matter as much as code quality. When in doubt, choose the simpler option.
 - **Simplicity first.** A new user must reach value (create group, add task, invite teammates) in under 2 minutes with no tutorial. Do not add options, settings, or screens that power users would want but students would not.
 - **Mobile-first.** Design and test at 360px width first; touch targets at least 44px; drag and drop must work with touch and have a non-drag alternative (for example a "move to" menu).
 - **Indonesian UI.** All user-facing text is Indonesian: friendly, polite, no jargon. Strings live in message files (`apps/web/src/messages/id.json`), never hard-coded in components.
-- **Vocabulary mapping.** UI says _Kelompok_ (workspace), _Proyek_ (board), _Kolom_ (list), _Tugas_ (card), _Ketua_ (OWNER), _Anggota_ (MEMBER). Code, database, and API keep the technical names.
+- **Vocabulary mapping.** UI says *Kelompok* (workspace), *Proyek* (board), *Kolom* (list), *Tugas* (card), *Ketua* (OWNER), *Pengelola* (ADMIN), *Anggota* (MEMBER). Code, database, and API keep the technical names.
 - **Friendly feel.** Clear empty states, helpful microcopy, small celebratory feedback on completion. Keep animations light and respect `prefers-reduced-motion`.
 - **Share-friendly.** Joining a group happens through a link that works well when pasted into WhatsApp.
 - **Safe defaults.** New projects start with a default three-column template (_Belum dikerjakan_, _Sedang dikerjakan_, _Selesai_) so no one faces an empty screen.

@@ -66,16 +66,17 @@ Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 - Passwords hashed with argon2.
 
 ### 4.2 Workspaces and Members (P0)
-
 - A user can create multiple workspaces and is its `OWNER`.
 - Roles: `OWNER`, `ADMIN`, `MEMBER`.
-  - OWNER: everything, including deleting the workspace.
-  - ADMIN: manage boards and members (except owner).
-  - MEMBER: create and edit cards, comment.
-- Invite by shareable link or short join code (P0). The link can be pasted into WhatsApp; opening it prompts registration or login, then joins the group.
+  - OWNER: everything, including deleting the workspace, changing member roles, and removing admins.
+  - ADMIN: manage boards, rename the workspace, remove regular members, and regenerate the invite link.
+  - MEMBER: see the workspace, its boards, and members; create and edit cards and comment (from M3); can leave the workspace.
+- Invite by shareable link or short join code (P0). Every member can see and share the link (it can be pasted into WhatsApp); only OWNER and ADMIN can regenerate it, which invalidates the old one. Opening the link shows the workspace name, then prompts registration or login, then joins the user as `MEMBER`.
+- A user who is not a member of a workspace gets 404 for it (its existence is not revealed). A member with an insufficient role gets 403.
+- The member list shows names and roles only, not emails.
 - Invite an existing user by email (P1).
 
-> **UI vocabulary:** the interface avoids tool jargon. In Indonesian UI copy: Workspace = _Kelompok_, Board = _Proyek_, List = _Kolom_, Card = _Tugas_, `OWNER` = _Ketua_, `MEMBER` = _Anggota_. Code, database, and API keep the technical names.
+> **UI vocabulary:** the interface avoids tool jargon. In Indonesian UI copy: Workspace = _Kelompok_, Board = _Proyek_, List = _Kolom_, Card = _Tugas_, `OWNER` = *Ketua*, `ADMIN` = *Pengelola*, `MEMBER` = *Anggota*. Code, database, and API keep the technical names.
 
 ### 4.3 Boards, Lists, Cards (P0)
 
@@ -181,7 +182,7 @@ User(id, email, name, passwordHash, createdAt)
 RefreshToken(id, userId, tokenHash, expiresAt, revokedAt)
 EmailCode(id, email, purpose, codeHash, attempts, expiresAt, issuedAt)   -- unique (email, purpose)
 
-Workspace(id, name, ownerId, createdAt)
+Workspace(id, name, ownerId, inviteCode, createdAt)
 WorkspaceMember(workspaceId, userId, role)           -- PK (workspaceId, userId)
 
 Board(id, workspaceId, name, createdAt, archivedAt)
@@ -201,9 +202,9 @@ Indexes: `Card(listId, position)`, `List(boardId, position)`, `WorkspaceMember(u
 | Area       | Endpoints                                                                                                                                  |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | Auth | `POST /auth/register/request-code`, `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`, `POST /auth/forgot-password`, `POST /auth/reset-password`                                       |
-| Workspaces | `GET/POST /workspaces`, `GET/PATCH/DELETE /workspaces/:id`, `POST /workspaces/:id/members`, `PATCH/DELETE /workspaces/:id/members/:userId` |
-| Boards     | `GET/POST /workspaces/:id/boards`, `GET/PATCH/DELETE /boards/:id` (GET returns lists + cards)                                              |
-| Lists      | `POST /boards/:id/lists`, `PATCH/DELETE /lists/:id`, `PATCH /lists/:id/move`                                                               |
+| Workspaces | `GET/POST /workspaces`, `GET/PATCH/DELETE /workspaces/:id`, `GET /workspaces/:id/members`, `PATCH/DELETE /workspaces/:id/members/:userId`, `POST /workspaces/:id/invite/regenerate` |
+| Invites | `GET /invites/:code` (public preview), `POST /invites/:code/join` |
+| Boards | `GET/POST /workspaces/:id/boards`, `GET/PATCH/DELETE /boards/:id` | Lists      | `POST /boards/:id/lists`, `PATCH/DELETE /lists/:id`, `PATCH /lists/:id/move`                                                               |
 | Cards      | `POST /lists/:id/cards`, `GET/PATCH/DELETE /cards/:id`, `PATCH /cards/:id/move`                                                            |
 | Comments   | `GET/POST /cards/:id/comments`, `PATCH/DELETE /comments/:id`                                                                               |
 | AI         | `POST /cards/:id/ai/subtasks`, `POST /cards/:id/ai/summary`                                                                                |
