@@ -10,12 +10,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { loginSchema, registerSchema } from '@kompak/shared';
+import {
+  loginSchema,
+  registerSchema,
+  requestCodeSchema,
+  resetPasswordSchema,
+} from '@kompak/shared';
 import type {
   AuthResponse,
   AuthUser,
   LoginInput,
   RegisterInput,
+  RequestCodeInput,
+  ResetPasswordInput,
 } from '@kompak/shared';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
@@ -35,6 +42,16 @@ const ONE_MINUTE_MS = 60_000;
 @UseGuards(RateLimitGuard)
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
+
+  @Public()
+  @RateLimit({ limit: 5, windowMs: ONE_MINUTE_MS })
+  @Post('register/request-code')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async requestRegistrationCode(
+    @Body(new ZodValidationPipe(requestCodeSchema)) body: RequestCodeInput,
+  ): Promise<void> {
+    await this.auth.requestRegistrationCode(body.email);
+  }
 
   @Public()
   @RateLimit({ limit: 10, windowMs: ONE_MINUTE_MS })
@@ -59,6 +76,26 @@ export class AuthController {
     const { auth, refreshToken } = await this.auth.login(body);
     setRefreshCookie(res, refreshToken);
     return auth;
+  }
+
+  @Public()
+  @RateLimit({ limit: 5, windowMs: ONE_MINUTE_MS })
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async forgotPassword(
+    @Body(new ZodValidationPipe(requestCodeSchema)) body: RequestCodeInput,
+  ): Promise<void> {
+    await this.auth.requestPasswordReset(body.email);
+  }
+
+  @Public()
+  @RateLimit({ limit: 10, windowMs: ONE_MINUTE_MS })
+  @Post('reset-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async resetPassword(
+    @Body(new ZodValidationPipe(resetPasswordSchema)) body: ResetPasswordInput,
+  ): Promise<void> {
+    await this.auth.resetPassword(body);
   }
 
   @Public()
