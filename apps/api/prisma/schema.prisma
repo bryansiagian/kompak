@@ -8,13 +8,26 @@ datasource db {
   provider = "postgresql"
 }
 
+enum EmailCodePurpose {
+  REGISTER
+  RESET_PASSWORD
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  name          String
-  passwordHash  String
-  createdAt     DateTime       @default(now())
-  refreshTokens RefreshToken[]
+  id              String            @id @default(uuid())
+  email           String            @unique
+  name            String
+  passwordHash    String
+  createdAt       DateTime          @default(now())
+  refreshTokens   RefreshToken[]
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
+  memberships     WorkspaceMember[]
 }
 
 model RefreshToken {
@@ -28,11 +41,6 @@ model RefreshToken {
   @@index([userId])
 }
 
-enum EmailCodePurpose {
-  REGISTER
-  RESET_PASSWORD
-}
-
 model EmailCode {
   id        String           @id @default(uuid())
   email     String
@@ -43,4 +51,38 @@ model EmailCode {
   issuedAt  DateTime         @default(now())
 
   @@unique([email, purpose])
+}
+
+model Workspace {
+  id         String            @id @default(uuid())
+  name       String
+  ownerId    String
+  owner      User              @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+  inviteCode String            @unique
+  createdAt  DateTime          @default(now())
+  members    WorkspaceMember[]
+  boards     Board[]
+}
+
+model WorkspaceMember {
+  workspaceId String
+  userId      String
+  role        WorkspaceRole
+  joinedAt    DateTime      @default(now())
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([workspaceId, userId])
+  @@index([userId])
+}
+
+model Board {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  createdAt   DateTime  @default(now())
+  archivedAt  DateTime?
+
+  @@index([workspaceId])
 }
