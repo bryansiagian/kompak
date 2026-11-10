@@ -15,6 +15,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+  
+  mailpit:
+    image: axllent/mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
 
   api:
     build:
@@ -24,12 +31,15 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql://kompak:kompak@db:5432/kompak
+      SMTP_URL: smtp://mailpit:1025
       PORT: 4000
     ports:
-      - '4000:4000'
+      - "4000:4000"
     depends_on:
       db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
 
   web:
     build:
