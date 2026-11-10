@@ -97,4 +97,22 @@ describe('apiRequest', () => {
     ).rejects.toMatchObject({ status: 401 });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('membawa kode error dari API (mis. INVALID_CODE) ke ApiError', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        json(400, { message: 'Invalid or expired code', code: 'INVALID_CODE' }),
+      ),
+    );
+
+    await expect(
+      apiRequest('/auth/register', {
+        method: 'POST',
+        body: {},
+        schema: meParser,
+        refreshOn401: false,
+      }),
+    ).rejects.toMatchObject({ status: 400, code: 'INVALID_CODE' });
+  });
 });

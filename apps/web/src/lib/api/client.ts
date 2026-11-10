@@ -40,20 +40,21 @@ function send(path: string, options: SendOptions): Promise<Response> {
 
 async function toApiError(response: Response): Promise<ApiError> {
   let message = response.statusText;
+  let code: string | undefined;
   try {
     const body: unknown = await response.json();
-    if (
-      typeof body === 'object' &&
-      body !== null &&
-      'message' in body &&
-      typeof body.message === 'string'
-    ) {
-      message = body.message;
+    if (typeof body === 'object' && body !== null) {
+      if ('message' in body && typeof body.message === 'string') {
+        message = body.message;
+      }
+      if ('code' in body && typeof body.code === 'string') {
+        code = body.code;
+      }
     }
   } catch {
     // Body kosong atau bukan JSON: pakai statusText.
   }
-  return new ApiError(response.status, message);
+  return new ApiError(response.status, message, code);
 }
 
 async function doRefresh(): Promise<AuthResponse | null> {
@@ -109,8 +110,12 @@ export async function apiRequest<T>(
   return options.schema.parse(await response.json());
 }
 
-export async function apiPostNoContent(path: string): Promise<void> {
-  const response = await send(path, { method: 'POST' });
+// POST yang dijawab 204 (tanpa isi), misalnya logout atau permintaan kode email.
+export async function apiPostNoContent(
+  path: string,
+  body?: unknown,
+): Promise<void> {
+  const response = await send(path, { method: 'POST', body });
   if (!response.ok) {
     throw await toApiError(response);
   }
