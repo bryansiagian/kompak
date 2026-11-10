@@ -40,7 +40,7 @@ The author is part of the target audience, which allows early feedback from real
 
 ### Non-Goals (MVP)
 
-- Mobile app, offline mode, file attachments, email notifications, billing, SSO/OAuth, integrations.
+- Mobile app, offline mode, file attachments, email notifications (transactional emails for verification and password reset are in scope) billing, SSO/OAuth, integrations.
 - Enterprise features (audit export, SAML, granular custom roles).
 - Becoming a full Trello/Jira clone. Features that add complexity for power users are intentionally left out.
 
@@ -58,8 +58,10 @@ The author is part of the target audience, which allows early feedback from real
 Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 
 ### 4.1 Authentication (P0)
-
-- Register, login, logout with email and password.
+- Register with an emailed 6-digit code: the user enters an email, receives a code, then submits the code with name and password. The account is created only after the email is proven.
+- Login, logout with email and password.
+- Forgot password: a 6-digit code is emailed; submitting it with a new password resets the password and revokes all sessions.
+- Codes expire after 15 minutes, are single-use, limited to 5 wrong attempts, and stored only as HMAC hashes.
 - Short-lived access token + rotating refresh token (httpOnly cookie).
 - Passwords hashed with argon2.
 
@@ -177,6 +179,7 @@ Key design decisions:
 ```
 User(id, email, name, passwordHash, createdAt)
 RefreshToken(id, userId, tokenHash, expiresAt, revokedAt)
+EmailCode(id, email, purpose, codeHash, attempts, expiresAt, issuedAt)   -- unique (email, purpose)
 
 Workspace(id, name, ownerId, createdAt)
 WorkspaceMember(workspaceId, userId, role)           -- PK (workspaceId, userId)
@@ -197,7 +200,7 @@ Indexes: `Card(listId, position)`, `List(boardId, position)`, `WorkspaceMember(u
 
 | Area       | Endpoints                                                                                                                                  |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Auth       | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`                                       |
+| Auth | `POST /auth/register/request-code`, `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`, `POST /auth/forgot-password`, `POST /auth/reset-password`                                       |
 | Workspaces | `GET/POST /workspaces`, `GET/PATCH/DELETE /workspaces/:id`, `POST /workspaces/:id/members`, `PATCH/DELETE /workspaces/:id/members/:userId` |
 | Boards     | `GET/POST /workspaces/:id/boards`, `GET/PATCH/DELETE /boards/:id` (GET returns lists + cards)                                              |
 | Lists      | `POST /boards/:id/lists`, `PATCH/DELETE /lists/:id`, `PATCH /lists/:id/move`                                                               |

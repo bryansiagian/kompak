@@ -32,6 +32,7 @@ jobs:
       DATABASE_URL: postgresql://kompak:kompak@localhost:5432/kompak
       JWT_ACCESS_SECRET: ci-access-secret-not-for-production
       JWT_REFRESH_SECRET: ci-refresh-secret-not-for-production
+      EMAIL_CODE_SECRET: ci-email-code-secret-not-for-production
       CORS_ORIGIN: http://localhost:3000
 
     steps:

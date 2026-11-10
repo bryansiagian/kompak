@@ -1,7 +1,9 @@
 import { createHash, randomBytes } from 'node:crypto';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -11,10 +13,14 @@ import type {
   AuthUser,
   LoginInput,
   RegisterInput,
+  ResetPasswordInput,
 } from '@kompak/shared';
 import { Prisma } from '../../generated/prisma/client';
+import { EmailCodePurpose } from '../../generated/prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
-import { REFRESH_TOKEN_TTL_MS } from './auth.constants';
+import { MailService } from '../mail/mail.service';
+import { EMAIL_CODE_TTL_MINUTES, REFRESH_TOKEN_TTL_MS } from './auth.constants';
+import { EmailCodeService } from './email-code.service';
 
 export interface AuthResult {
   auth: AuthResponse;
@@ -28,16 +34,52 @@ function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
 }
 
+function invalidCode(): BadRequestException {
+  return new BadRequestException({
+    message: 'Invalid or expired code',
+    code: 'INVALID_CODE',
+  });
+}
+
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private dummyHash?: Promise<string>;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly emailCodes: EmailCodeService,
+    private readonly mail: MailService,
   ) {}
 
+  async requestRegistrationCode(email: string): Promise<void> {
+    const existing = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+    if (existing) {
+      // Respons tetap sama agar tidak membocorkan email terdaftar;
+      // pemiliknya diberi tahu lewat email.
+      this.deliver(() => this.mail.sendAlreadyRegisteredNotice(email));
+      return;
+    }
+
+    const code = await this.emailCodes.issue(email, EmailCodePurpose.REGISTER);
+    if (code) {
+      await this.mail.sendRegistrationCode(email, code, EMAIL_CODE_TTL_MINUTES);
+    }
+  }
+
   async register(input: RegisterInput): Promise<AuthResult> {
+    const valid = await this.emailCodes.consume(
+      input.email,
+      EmailCodePurpose.REGISTER,
+      input.code,
+    );
+    if (!valid) {
+      throw invalidCode();
+    }
     const user = await this.createUser(input);
     return this.issueSession(user);
   }
@@ -54,6 +96,52 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
     return this.issueSession(user);
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+    if (!user) {
+      return;
+    }
+    const code = await this.emailCodes.issue(
+      email,
+      EmailCodePurpose.RESET_PASSWORD,
+    );
+    if (code) {
+      this.deliver(() =>
+        this.mail.sendPasswordResetCode(email, code, EMAIL_CODE_TTL_MINUTES),
+      );
+    }
+  }
+
+  async resetPassword(input: ResetPasswordInput): Promise<void> {
+    const valid = await this.emailCodes.consume(
+      input.email,
+      EmailCodePurpose.RESET_PASSWORD,
+      input.code,
+    );
+    const user = valid
+      ? await this.prisma.user.findUnique({
+          where: { email: input.email },
+          select: { id: true },
+        })
+      : null;
+    if (!user) {
+      throw invalidCode();
+    }
+
+    const passwordHash = await hash(input.password);
+    await this.prisma.$transaction([
+      this.prisma.user.update({ where: { id: user.id }, data: { passwordHash } }),
+      // Semua sesi lama dicabut; access token yang sudah terbit habis sendiri dalam 15 menit.
+      this.prisma.refreshToken.updateMany({
+        where: { userId: user.id, revokedAt: null },
+        data: { revokedAt: new Date() },
+      }),
+    ]);
   }
 
   async refresh(token: string | undefined): Promise<AuthResult> {
@@ -120,6 +208,17 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
     return user;
+  }
+
+  // Dipakai untuk email yang tidak boleh memengaruhi respons (mis. mencegah
+  // pembedaan email terdaftar): kegagalan hanya dicatat.
+  private deliver(send: () => Promise<void>): void {
+    send().catch((error: unknown) => {
+      this.logger.error(
+        'Failed to deliver email',
+        error instanceof Error ? error.stack : String(error),
+      );
+    });
   }
 
   private async createUser(input: RegisterInput): Promise<UserSummary> {

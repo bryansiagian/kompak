@@ -27,10 +27,7 @@ afterEach(() => {
 
 describe('apiRequest', () => {
   it('mengirim access token dan cookie (credentials include)', async () => {
-    const fetchMock = vi.fn(
-      async (_url: string | URL | Request, _init?: RequestInit) =>
-        json(200, user),
-    );
+    const fetchMock = vi.fn<typeof fetch>(async () => json(200, user));
     vi.stubGlobal('fetch', fetchMock);
     setAccessToken('abc');
 
@@ -96,5 +93,23 @@ describe('apiRequest', () => {
       }),
     ).rejects.toMatchObject({ status: 401 });
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('membawa kode error dari API (mis. INVALID_CODE) ke ApiError', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        json(400, { message: 'Invalid or expired code', code: 'INVALID_CODE' }),
+      ),
+    );
+
+    await expect(
+      apiRequest('/auth/register', {
+        method: 'POST',
+        body: {},
+        schema: meParser,
+        refreshOn401: false,
+      }),
+    ).rejects.toMatchObject({ status: 400, code: 'INVALID_CODE' });
   });
 });

@@ -1,8 +1,21 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { AuthUser, LoginInput, RegisterInput } from '@kompak/shared';
-import { login, logout, register, restoreSession } from '@/lib/api/auth';
+import type {
+  AuthUser,
+  LoginInput,
+  RegisterInput,
+  ResetPasswordInput,
+} from '@kompak/shared';
+import {
+  forgotPassword,
+  login,
+  logout,
+  register,
+  requestRegistrationCode,
+  resetPassword,
+  restoreSession,
+} from '@/lib/api/auth';
 
 export const SESSION_QUERY_KEY = ['session'] as const;
 
@@ -25,6 +38,12 @@ export function useLoginMutation() {
   });
 }
 
+export function useRequestRegistrationCodeMutation() {
+  return useMutation({
+    mutationFn: (email: string) => requestRegistrationCode(email),
+  });
+}
+
 export function useRegisterMutation() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -32,6 +51,18 @@ export function useRegisterMutation() {
     onSuccess: (user) => {
       queryClient.setQueryData(SESSION_QUERY_KEY, user);
     },
+  });
+}
+
+export function useForgotPasswordMutation() {
+  return useMutation({
+    mutationFn: (email: string) => forgotPassword(email),
+  });
+}
+
+export function useResetPasswordMutation() {
+  return useMutation({
+    mutationFn: (input: ResetPasswordInput) => resetPassword(input),
   });
 }
 

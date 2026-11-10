@@ -16,28 +16,70 @@
       "subtitle": "Lanjutkan tugas kelompokmu.",
       "submit": "Masuk",
       "submitting": "Sedang masuk…",
+      "forgot": "Lupa kata sandi?",
       "switchText": "Belum punya akun?",
       "switchLink": "Daftar dulu"
     },
     "register": {
-      "title": "Buat akun Kompak",
-      "subtitle": "Gratis, dan cuma butuh satu menit.",
-      "submit": "Daftar",
-      "submitting": "Sedang mendaftar…",
+      "emailStep": {
+        "title": "Buat akun Kompak",
+        "subtitle": "Masukkan emailmu dulu. Kami kirim kode untuk memastikan email itu milikmu.",
+        "submit": "Kirim kode",
+        "submitting": "Mengirim kode…"
+      },
+      "detailsStep": {
+        "title": "Cek emailmu",
+        "subtitle": "Kami kirim kode 6 digit ke {email}. Masukkan kode itu dan lengkapi datamu.",
+        "submit": "Daftar",
+        "submitting": "Sedang mendaftar…"
+      },
       "switchText": "Sudah punya akun?",
       "switchLink": "Masuk"
+    },
+    "forgot": {
+      "emailStep": {
+        "title": "Lupa kata sandi?",
+        "subtitle": "Masukkan emailmu. Kalau terdaftar, kami kirim kode untuk membuat kata sandi baru.",
+        "submit": "Kirim kode",
+        "submitting": "Mengirim kode…"
+      },
+      "resetStep": {
+        "title": "Buat kata sandi baru",
+        "subtitle": "Kalau {email} terdaftar, kami sudah mengirim kode 6 digit. Masukkan kode itu dan kata sandi barumu.",
+        "submit": "Simpan kata sandi baru",
+        "submitting": "Menyimpan…"
+      },
+      "done": {
+        "title": "Kata sandi sudah diganti",
+        "subtitle": "Demi keamanan, semua perangkat yang sedang masuk dikeluarkan. Silakan masuk dengan kata sandi barumu.",
+        "toLogin": "Masuk sekarang"
+      },
+      "switchText": "Ingat kata sandimu?",
+      "switchLink": "Masuk"
+    },
+    "code": {
+      "resend": "Kirim ulang kode",
+      "resendIn": "Kirim ulang dalam {seconds} detik",
+      "resent": "Kode baru sudah dikirim.",
+      "changeEmail": "Ganti email"
     },
     "fields": {
       "email": "Email",
       "name": "Nama",
       "password": "Kata sandi",
-      "passwordHint": "Minimal 8 karakter."
+      "passwordHint": "Minimal 8 karakter.",
+      "newPassword": "Kata sandi baru",
+      "code": "Kode dari email",
+      "codeHint": "Kode berlaku 15 menit. Cek folder spam kalau belum masuk."
     },
     "errors": {
       "emailInvalid": "Email belum benar. Coba cek lagi ya.",
       "nameRequired": "Nama jangan dikosongkan ya.",
       "passwordMin": "Kata sandi minimal 8 karakter.",
       "passwordRequired": "Isi kata sandimu dulu ya.",
+      "codeInvalid": "Kode terdiri dari 6 angka.",
+      "invalidCode": "Kodenya belum cocok atau sudah kedaluwarsa. Minta kode baru kalau perlu.",
+      "mailFailed": "Email belum bisa dikirim. Coba lagi sebentar lagi ya.",
       "emailTaken": "Email ini sudah terdaftar. Coba masuk saja.",
       "invalidCredentials": "Email atau kata sandi belum cocok. Coba lagi ya.",
       "tooManyRequests": "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.",

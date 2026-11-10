@@ -27,3 +27,20 @@ model RefreshToken {
 
   @@index([userId])
 }
+
+enum EmailCodePurpose {
+  REGISTER
+  RESET_PASSWORD
+}
+
+model EmailCode {
+  id        String           @id @default(uuid())
+  email     String
+  purpose   EmailCodePurpose
+  codeHash  String
+  attempts  Int              @default(0)
+  expiresAt DateTime
+  issuedAt  DateTime         @default(now())
+
+  @@unique([email, purpose])
+}

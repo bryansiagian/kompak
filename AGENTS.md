@@ -79,7 +79,7 @@ Before finishing any task, run: `pnpm lint && pnpm typecheck && pnpm test`.
 ## Environment variables
 
 Defined in `.env.example` (never commit real `.env`). Expected keys:
-`DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `COOKIE_DOMAIN`, `CORS_ORIGIN`,
+`DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `EMAIL_CODE_SECRET`, `SMTP_URL`, `MAIL_FROM`, `COOKIE_DOMAIN`, `CORS_ORIGIN`,
 `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WS_URL`, `AI_API_KEY`, `AI_MODEL`, `AI_DAILY_BUDGET`.
 Variables without the `NEXT_PUBLIC_` prefix must never be read in browser code.
 
