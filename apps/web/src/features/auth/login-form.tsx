@@ -5,7 +5,9 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { loginSchema } from '@kompak/shared';
 import { Button } from '@/components/ui/button';
+import { FormAlert } from '@/components/ui/form-alert';
 import { TextField } from '@/components/ui/text-field';
+import { TextLink } from '@/components/ui/text-link';
 import { AuthCard } from './auth-card';
 import { authErrorKey } from './errors';
 import { GuestOnly } from './guest-only';
@@ -55,9 +57,11 @@ export function LoginForm() {
       <AuthCard
         title={t('login.title')}
         subtitle={t('login.subtitle')}
-        switchText={t('login.switchText')}
-        switchLabel={t('login.switchLink')}
-        switchHref="/register"
+        footer={{
+          text: t('login.switchText'),
+          label: t('login.switchLink'),
+          href: '/register',
+        }}
       >
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <TextField
@@ -75,14 +79,10 @@ export function LoginForm() {
             autoComplete="current-password"
             error={fieldErrors.password}
           />
-          {formError ? (
-            <p
-              role="alert"
-              className="rounded-xl bg-red-50 px-3.5 py-3 text-sm text-red-700"
-            >
-              {formError}
-            </p>
-          ) : null}
+          <div className="-mt-2 text-right">
+            <TextLink href="/forgot-password">{t('login.forgot')}</TextLink>
+          </div>
+          {formError ? <FormAlert>{formError}</FormAlert> : null}
           <Button type="submit" fullWidth disabled={login.isPending}>
             {login.isPending ? t('login.submitting') : t('login.submit')}
           </Button>

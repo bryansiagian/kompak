@@ -1,26 +1,23 @@
 'use client';
 
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
+import { TextLink } from '@/components/ui/text-link';
+
+interface AuthCardFooter {
+  text: string;
+  label: string;
+  href: string;
+}
 
 interface AuthCardProps {
   title: string;
   subtitle: string;
   children: ReactNode;
-  switchText: string;
-  switchLabel: string;
-  switchHref: string;
+  footer?: AuthCardFooter;
 }
 
-export function AuthCard({
-  title,
-  subtitle,
-  children,
-  switchText,
-  switchLabel,
-  switchHref,
-}: AuthCardProps) {
+export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   const t = useTranslations('common');
 
   return (
@@ -36,15 +33,11 @@ export function AuthCard({
         <div className="mt-5">{children}</div>
       </div>
 
-      <p className="mt-4 text-center text-sm text-stone-600">
-        {switchText}{' '}
-        <Link
-          href={switchHref}
-          className="inline-flex min-h-11 items-center font-semibold text-emerald-700 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-        >
-          {switchLabel}
-        </Link>
-      </p>
+      {footer ? (
+        <p className="mt-4 text-center text-sm text-stone-600">
+          {footer.text} <TextLink href={footer.href}>{footer.label}</TextLink>
+        </p>
+      ) : null}
     </main>
   );
 }
