@@ -27,10 +27,7 @@ afterEach(() => {
 
 describe('apiRequest', () => {
   it('mengirim access token dan cookie (credentials include)', async () => {
-    const fetchMock = vi.fn(
-      async (_url: string | URL | Request, _init?: RequestInit) =>
-        json(200, user),
-    );
+    const fetchMock = vi.fn<typeof fetch>(async () => json(200, user));
     vi.stubGlobal('fetch', fetchMock);
     setAccessToken('abc');
 
