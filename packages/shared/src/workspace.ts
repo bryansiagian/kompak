@@ -71,3 +71,7 @@ export const boardSchema = z.object({
   createdAt: z.string(),
 });
 export type Board = z.infer<typeof boardSchema>;
+
+export const workspaceSummaryListSchema = z.array(workspaceSummarySchema);
+export const memberListSchema = z.array(memberSchema);
+export const boardListSchema = z.array(boardSchema);
