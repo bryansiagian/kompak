@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { useSession } from './hooks';
+import { peekNextPath } from './next-path';
 
 export function GuestOnly({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -12,7 +13,8 @@ export function GuestOnly({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user) {
-      router.replace('/');
+      // Tujuan disimpan oleh halaman undangan; dibersihkan di sana setelah tiba.
+      router.replace(peekNextPath() ?? '/');
     }
   }, [user, router]);
 
