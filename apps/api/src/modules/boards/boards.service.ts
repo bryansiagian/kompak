@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import type { Board } from '@kompak/shared';
+import type { Board, BoardDetail } from '@kompak/shared';
+import { POSITION_STEP } from '../../common/ordering';
 import { WorkspaceRole } from '../../generated/prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
 import { WorkspaceAccessService } from '../workspaces/workspace-access.service';
+import { toCard, toList } from './board-mappers';
+import { DEFAULT_LIST_NAMES } from './default-lists';
 
 const MANAGER_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN];
 
@@ -37,14 +40,41 @@ export class BoardsService {
   }
 
   async create(workspaceId: string, name: string): Promise<Board> {
+    // Proyek baru langsung berisi tiga kolom bawaan (dibuat bersamaan, atomik).
     const board = await this.prisma.board.create({
-      data: { workspaceId, name },
+      data: {
+        workspaceId,
+        name,
+        lists: {
+          create: DEFAULT_LIST_NAMES.map((listName, index) => ({
+            name: listName,
+            position: (index + 1) * POSITION_STEP,
+          })),
+        },
+      },
     });
     return toBoard(board);
   }
 
-  async get(userId: string, boardId: string): Promise<Board> {
-    return toBoard(await this.access.requireBoard(userId, boardId));
+  async get(userId: string, boardId: string): Promise<BoardDetail> {
+    const board = await this.access.requireBoard(userId, boardId);
+    const lists = await this.prisma.list.findMany({
+      where: { boardId: board.id, archivedAt: null },
+      orderBy: [{ position: 'asc' }, { id: 'asc' }],
+      include: {
+        cards: {
+          where: { archivedAt: null },
+          orderBy: [{ position: 'asc' }, { id: 'asc' }],
+        },
+      },
+    });
+    return {
+      ...toBoard(board),
+      lists: lists.map((list) => ({
+        ...toList(list),
+        cards: list.cards.map(toCard),
+      })),
+    };
   }
 
   async rename(userId: string, boardId: string, name: string): Promise<Board> {

@@ -12,6 +12,7 @@ import {
 import { createBoardSchema, updateBoardSchema } from '@kompak/shared';
 import type {
   Board,
+  BoardDetail,
   CreateBoardInput,
   UpdateBoardInput,
 } from '@kompak/shared';
@@ -49,7 +50,7 @@ export class BoardsController {
   get(
     @CurrentUser() user: AuthenticatedUser,
     @Param('boardId') boardId: string,
-  ): Promise<Board> {
+  ): Promise<BoardDetail> {
     return this.boards.get(user.id, boardId);
   }
 
