@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { apiRequest } from './client';
+import { apiNoContent, apiRequest } from './client';
 import { getAccessToken, setAccessToken } from './token-store';
 
 vi.mock('@kompak/shared', () => ({
@@ -111,5 +111,31 @@ describe('apiRequest', () => {
         refreshOn401: false,
       }),
     ).rejects.toMatchObject({ status: 400, code: 'INVALID_CODE' });
+  });
+});
+
+describe('apiNoContent', () => {
+  it('mengulang permintaan DELETE setelah refresh saat token kedaluwarsa', async () => {
+    let refreshCalls = 0;
+    const tokensSeen: Array<string | null> = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+        if (String(url).endsWith('/auth/refresh')) {
+          refreshCalls += 1;
+          return json(200, { accessToken: 'fresh', user });
+        }
+        tokensSeen.push(bearerOf(init));
+        return bearerOf(init) === 'Bearer fresh'
+          ? new Response(null, { status: 204 })
+          : json(401, { message: 'Invalid or expired access token' });
+      }),
+    );
+    setAccessToken('stale');
+
+    await apiNoContent('/boards/b1', { method: 'DELETE' });
+
+    expect(refreshCalls).toBe(1);
+    expect(tokensSeen).toEqual(['Bearer stale', 'Bearer fresh']);
   });
 });
