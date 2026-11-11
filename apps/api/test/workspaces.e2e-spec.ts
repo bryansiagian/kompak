@@ -19,15 +19,17 @@ describe('Workspaces (e2e)', () => {
 
   beforeAll(async () => {
     t = await TestApp.create();
-    owner = await t.registerUser('owner');
-    admin = await t.registerUser('admin');
-    member = await t.registerUser('member');
-    member2 = await t.registerUser('member2');
-    outsider = await t.registerUser('outsider');
+    [owner, admin, member, member2, outsider] = await Promise.all([
+      t.registerUser('owner'),
+      t.registerUser('admin'),
+      t.registerUser('member'),
+      t.registerUser('member2'),
+      t.registerUser('outsider'),
+    ]);
   });
 
   afterAll(async () => {
-    await t.cleanup();
+    await t?.cleanup();
   });
 
   async function createWorkspace(

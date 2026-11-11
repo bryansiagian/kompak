@@ -10,14 +10,20 @@ export interface Parser<T> {
   parse(data: unknown): T;
 }
 
+type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+
 interface SendOptions {
-  method?: 'GET' | 'POST';
+  method?: HttpMethod;
   body?: unknown;
 }
 
 interface RequestOptions<T> extends SendOptions {
   schema: Parser<T>;
   // Dimatikan untuk login/register: 401 di sana berarti kredensial salah.
+  refreshOn401?: boolean;
+}
+
+interface NoContentOptions extends SendOptions {
   refreshOn401?: boolean;
 }
 
@@ -85,11 +91,11 @@ export function refreshSession(): Promise<AuthResponse | null> {
   return refreshing;
 }
 
-export async function apiRequest<T>(
+async function sendWithRefresh(
   path: string,
-  options: RequestOptions<T>,
-): Promise<T> {
-  const { refreshOn401 = true } = options;
+  options: SendOptions,
+  refreshOn401: boolean,
+): Promise<Response> {
   const sentToken = getAccessToken();
   let response = await send(path, options);
 
@@ -103,20 +109,40 @@ export async function apiRequest<T>(
       response = await send(path, options);
     }
   }
+  return response;
+}
 
+export async function apiRequest<T>(
+  path: string,
+  options: RequestOptions<T>,
+): Promise<T> {
+  const response = await sendWithRefresh(
+    path,
+    options,
+    options.refreshOn401 ?? true,
+  );
   if (!response.ok) {
     throw await toApiError(response);
   }
   return options.schema.parse(await response.json());
 }
 
-// POST yang dijawab 204 (tanpa isi), misalnya logout atau permintaan kode email.
-export async function apiPostNoContent(
+// Permintaan yang dijawab 204 (tanpa isi), mis. menghapus proyek.
+export async function apiNoContent(
   path: string,
-  body?: unknown,
+  options: NoContentOptions = {},
 ): Promise<void> {
-  const response = await send(path, { method: 'POST', body });
+  const response = await sendWithRefresh(
+    path,
+    options,
+    options.refreshOn401 ?? true,
+  );
   if (!response.ok) {
     throw await toApiError(response);
   }
+}
+
+// POST publik tanpa isi balasan (logout, permintaan kode email): tanpa refresh.
+export function apiPostNoContent(path: string, body?: unknown): Promise<void> {
+  return apiNoContent(path, { method: 'POST', body, refreshOn401: false });
 }

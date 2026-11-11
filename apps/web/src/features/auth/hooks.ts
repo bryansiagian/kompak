@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import type {
   AuthUser,
   LoginInput,
@@ -19,6 +20,13 @@ import {
 
 export const SESSION_QUERY_KEY = ['session'] as const;
 
+// Membuang semua data kecuali sesi, agar data satu pengguna tidak terbawa ke pengguna lain.
+function clearUserData(queryClient: QueryClient): void {
+  queryClient.removeQueries({
+    predicate: (query) => query.queryKey[0] !== SESSION_QUERY_KEY[0],
+  });
+}
+
 export function useSession() {
   return useQuery<AuthUser | null>({
     queryKey: SESSION_QUERY_KEY,
@@ -33,6 +41,7 @@ export function useLoginMutation() {
   return useMutation({
     mutationFn: (input: LoginInput) => login(input),
     onSuccess: (user) => {
+      clearUserData(queryClient);
       queryClient.setQueryData(SESSION_QUERY_KEY, user);
     },
   });
@@ -49,6 +58,7 @@ export function useRegisterMutation() {
   return useMutation({
     mutationFn: (input: RegisterInput) => register(input),
     onSuccess: (user) => {
+      clearUserData(queryClient);
       queryClient.setQueryData(SESSION_QUERY_KEY, user);
     },
   });
@@ -71,7 +81,7 @@ export function useLogoutMutation() {
   return useMutation({
     mutationFn: () => logout(),
     onSettled: () => {
-      queryClient.clear();
+      clearUserData(queryClient);
       queryClient.setQueryData(SESSION_QUERY_KEY, null);
     },
   });

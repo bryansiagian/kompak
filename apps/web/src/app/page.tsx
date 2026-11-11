@@ -1,5 +1,5 @@
-import { HomeScreen } from '@/features/home/home-screen';
+import { GroupsScreen } from '@/features/workspaces/groups-screen';
 
 export default function HomePage() {
-  return <HomeScreen />;
+  return <GroupsScreen />;
 }

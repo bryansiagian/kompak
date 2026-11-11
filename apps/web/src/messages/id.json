@@ -8,7 +8,9 @@
     "tagline": "Tugas kelompok jadi lebih kompak.",
     "loading": "Sebentar ya…",
     "logout": "Keluar",
-    "loggingOut": "Sedang keluar…"
+    "loggingOut": "Sedang keluar…",
+    "cancel": "Batal",
+    "save": "Simpan"
   },
   "auth": {
     "login": {
@@ -87,8 +89,114 @@
       "generic": "Ada yang tidak beres. Coba lagi sebentar lagi ya."
     }
   },
-  "home": {
-    "greeting": "Halo, {name}!",
-    "intro": "Kamu sudah masuk. Kelompok dan tugasmu akan muncul di sini."
+  "groups": {
+    "pageTitle": "Kelompok",
+    "roles": {
+      "OWNER": "Ketua",
+      "ADMIN": "Pengelola",
+      "MEMBER": "Anggota"
+    },
+    "errors": {
+      "notFound": "Yang kamu cari tidak ditemukan, atau kamu bukan anggotanya.",
+      "forbidden": "Kamu tidak punya izin untuk melakukan ini.",
+      "tooManyRequests": "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.",
+      "network": "Tidak bisa terhubung ke server. Cek koneksimu lalu coba lagi.",
+      "generic": "Ada yang tidak beres. Coba lagi sebentar lagi ya."
+    },
+    "list": {
+      "greeting": "Halo, {name}!",
+      "title": "Kelompok saya",
+      "empty": "Belum ada kelompok. Buat kelompok pertamamu, lalu bagikan tautannya ke grup WhatsApp.",
+      "create": "Buat kelompok",
+      "memberCount": "{count} anggota",
+      "boardCount": "{count} proyek"
+    },
+    "joinCode": {
+      "title": "Punya kode atau tautan undangan?",
+      "description": "Tempel kode atau tautannya di sini untuk bergabung ke kelompok temanmu.",
+      "label": "Kode atau tautan undangan",
+      "submit": "Lanjut",
+      "required": "Isi kode atau tautan undangannya dulu ya."
+    },
+    "create": {
+      "title": "Buat kelompok",
+      "description": "Beri nama kelompokmu, misalnya nama mata kuliah atau tugasnya.",
+      "name": "Nama kelompok",
+      "nameRequired": "Nama kelompok jangan dikosongkan ya.",
+      "submit": "Buat kelompok",
+      "submitting": "Membuat kelompok…",
+      "back": "← Kelompok saya"
+    },
+    "detail": {
+      "back": "← Kelompok saya",
+      "notFoundTitle": "Kelompok tidak ditemukan",
+      "notFoundBody": "Mungkin tautannya salah, atau kamu sudah bukan anggota kelompok ini."
+    },
+    "projects": {
+      "title": "Proyek",
+      "descriptionManager": "Satu proyek untuk satu tugas besar. Di dalamnya nanti ada kolom dan tugas.",
+      "descriptionMember": "Proyek yang dibuat Ketua atau Pengelola muncul di sini.",
+      "emptyManager": "Belum ada proyek. Buat satu untuk mulai membagi tugas.",
+      "emptyMember": "Belum ada proyek.",
+      "name": "Nama proyek",
+      "nameRequired": "Nama proyek jangan dikosongkan ya.",
+      "add": "Tambah proyek",
+      "adding": "Menambahkan…",
+      "rename": "Ubah nama",
+      "delete": "Hapus",
+      "deletePrompt": "Hapus proyek ini? Isinya ikut hilang dan tidak bisa dikembalikan.",
+      "deleteConfirm": "Ya, hapus"
+    },
+    "members": {
+      "title": "Anggota",
+      "you": "(kamu)",
+      "makeAdmin": "Jadikan Pengelola",
+      "makeMember": "Jadikan Anggota",
+      "remove": "Keluarkan",
+      "removePrompt": "Keluarkan {name} dari kelompok?",
+      "removeConfirm": "Ya, keluarkan"
+    },
+    "invite": {
+      "title": "Ajak teman",
+      "description": "Bagikan tautan ini ke grup WhatsApp kelompokmu. Siapa pun yang punya tautannya bisa bergabung.",
+      "linkLabel": "Tautan undangan",
+      "codeLabel": "Atau beri tahu kodenya: {code}",
+      "whatsapp": "Bagikan ke WhatsApp",
+      "copy": "Salin tautan",
+      "copied": "Tautan tersalin!",
+      "copyFailed": "Tidak bisa menyalin otomatis. Tekan lama pada tautan di atas lalu salin.",
+      "shareText": "Yuk gabung kelompok {name} di Kompak: {link}",
+      "regenerate": "Ganti tautan",
+      "regeneratePrompt": "Tautan dan kode yang lama tidak akan berlaku lagi. Lanjutkan?",
+      "regenerateConfirm": "Ya, ganti"
+    },
+    "settings": {
+      "title": "Pengaturan",
+      "name": "Nama kelompok",
+      "nameRequired": "Nama kelompok jangan dikosongkan ya.",
+      "save": "Simpan nama",
+      "saving": "Menyimpan…",
+      "delete": "Hapus kelompok",
+      "deletePrompt": "Hapus kelompok ini? Semua proyek ikut terhapus dan tidak bisa dikembalikan.",
+      "deleteConfirm": "Ya, hapus kelompok",
+      "leave": "Keluar dari kelompok",
+      "leavePrompt": "Keluar dari kelompok ini? Kamu perlu tautan undangan baru untuk bergabung lagi.",
+      "leaveConfirm": "Ya, keluar"
+    }
+  },
+  "join": {
+    "pageTitle": "Undangan kelompok",
+    "title": "Kamu diundang ke {name}",
+    "subtitle": "{count} anggota sudah bergabung.",
+    "submit": "Gabung ke kelompok",
+    "submitting": "Sedang bergabung…",
+    "guestHint": "Masuk atau daftar dulu supaya bisa bergabung. Setelah itu kamu otomatis kembali ke sini.",
+    "login": "Masuk",
+    "register": "Daftar",
+    "invalid": {
+      "title": "Tautan tidak berlaku",
+      "subtitle": "Tautan atau kode undangan ini salah atau sudah diganti. Minta tautan baru ke Ketua atau Pengelola kelompoknya.",
+      "home": "Ke beranda"
+    }
   }
 }
