@@ -79,12 +79,13 @@ Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 > **UI vocabulary:** the interface avoids tool jargon. In Indonesian UI copy: Workspace = _Kelompok_, Board = _Proyek_, List = _Kolom_, Card = _Tugas_, `OWNER` = *Ketua*, `ADMIN` = *Pengelola*, `MEMBER` = *Anggota*. Code, database, and API keep the technical names.
 
 ### 4.3 Boards, Lists, Cards (P0)
-
 - A workspace has many boards; a board has ordered lists; a list has ordered cards.
-- Card fields: title, description (markdown), assignee, due date, labels, position.
-- Create, edit, delete, archive cards and lists.
-- Drag and drop to reorder cards within a list and move across lists, and to reorder lists.
-- Ordering persists and is stable under concurrent edits.
+- A new board starts with three lists: Belum dikerjakan, Sedang dikerjakan, Selesai.
+- Card fields: title, description (markdown), assignee (must be a workspace member), due date (a calendar date, no time), position. Labels move to M5 together with filters.
+- Quick-add: a card needs only a title and is appended to the end of its list.
+- Lists (columns) are managed by OWNER and ADMIN: create, rename, delete, reorder. Any member creates, edits, and moves cards. A card can be deleted by its creator, an ADMIN, or the OWNER.
+- Drag and drop to reorder cards within a list and move across lists, and to reorder lists. Moves are anchor-based ("insert before card X, or at the end") so they stay correct when someone else changed the list in the meantime.
+- Ordering persists with fractional positions. When the gap between two neighbours becomes too small, the list is renumbered inside the same transaction.
 
 ### 4.4 Real-Time Collaboration (P0)
 
@@ -189,8 +190,8 @@ Board(id, workspaceId, name, createdAt, archivedAt)
 List(id, boardId, name, position, archivedAt)
 Card(id, listId, boardId, title, description, assigneeId?, dueDate?, position,
      createdById, createdAt, updatedAt, archivedAt)
-Label(id, boardId, name, color)
-CardLabel(cardId, labelId)
+Label(id, boardId, name, color)          -- arrives in M5
+CardLabel(cardId, labelId)               -- arrives in M5
 Comment(id, cardId, authorId, body, createdAt, updatedAt)
 Activity(id, boardId, cardId?, actorId, type, payload JSON, createdAt)
 ```
@@ -203,9 +204,10 @@ Indexes: `Card(listId, position)`, `List(boardId, position)`, `WorkspaceMember(u
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | Auth | `POST /auth/register/request-code`, `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`, `POST /auth/forgot-password`, `POST /auth/reset-password`                                       |
 | Workspaces | `GET/POST /workspaces`, `GET/PATCH/DELETE /workspaces/:id`, `GET /workspaces/:id/members`, `PATCH/DELETE /workspaces/:id/members/:userId`, `POST /workspaces/:id/invite/regenerate` |
-| Invites | `GET /invites/:code` (public preview), `POST /invites/:code/join` |
-| Boards | `GET/POST /workspaces/:id/boards`, `GET/PATCH/DELETE /boards/:id` | Lists      | `POST /boards/:id/lists`, `PATCH/DELETE /lists/:id`, `PATCH /lists/:id/move`                                                               |
-| Cards      | `POST /lists/:id/cards`, `GET/PATCH/DELETE /cards/:id`, `PATCH /cards/:id/move`                                                            |
+| Invites | `GET /invites/:code` (public preview), `POST /invites/:code/join`                                                                             |
+| Boards | `GET/POST /workspaces/:id/boards`, `GET/PATCH/DELETE /boards/:id` (GET returns lists + cards)                                                  |
+| Lists | `POST /boards/:id/lists`, `PATCH/DELETE /lists/:id`, `PATCH /lists/:id/move` (body: `beforeListId`)                                             |
+| Cards | `POST /lists/:id/cards`, `GET/PATCH/DELETE /cards/:id`, `PATCH /cards/:id/move` (body: `listId`, `beforeCardId`)                                |
 | Comments   | `GET/POST /cards/:id/comments`, `PATCH/DELETE /comments/:id`                                                                               |
 | AI         | `POST /cards/:id/ai/subtasks`, `POST /cards/:id/ai/summary`                                                                                |
 | System     | `GET /health`                                                                                                                              |
