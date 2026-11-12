@@ -134,8 +134,8 @@
     },
     "projects": {
       "title": "Proyek",
-      "descriptionManager": "Satu proyek untuk satu tugas besar. Di dalamnya nanti ada kolom dan tugas.",
-      "descriptionMember": "Proyek yang dibuat Ketua atau Pengelola muncul di sini.",
+      "descriptionManager": "Satu proyek untuk satu tugas besar. Buka proyeknya untuk melihat kolom dan tugas.",
+      "descriptionMember": "Proyek yang dibuat Ketua atau Pengelola muncul di sini. Ketuk untuk membukanya.",
       "emptyManager": "Belum ada proyek. Buat satu untuk mulai membagi tugas.",
       "emptyMember": "Belum ada proyek.",
       "name": "Nama proyek",
@@ -144,7 +144,7 @@
       "adding": "Menambahkan…",
       "rename": "Ubah nama",
       "delete": "Hapus",
-      "deletePrompt": "Hapus proyek ini? Isinya ikut hilang dan tidak bisa dikembalikan.",
+      "deletePrompt": "Hapus proyek ini? Semua kolom dan tugasnya ikut hilang dan tidak bisa dikembalikan.",
       "deleteConfirm": "Ya, hapus"
     },
     "members": {
@@ -197,6 +197,78 @@
       "title": "Tautan tidak berlaku",
       "subtitle": "Tautan atau kode undangan ini salah atau sudah diganti. Minta tautan baru ke Ketua atau Pengelola kelompoknya.",
       "home": "Ke beranda"
+    }
+  },
+  "board": {
+    "pageTitle": "Proyek",
+    "notFoundTitle": "Proyek tidak ditemukan",
+    "notFoundBody": "Mungkin tautannya salah, proyeknya sudah dihapus, atau kamu sudah bukan anggota kelompok ini.",
+    "backToGroup": "← Kembali ke kelompok",
+    "backHome": "← Kelompok saya",
+    "emptyBoard": "Belum ada kolom di proyek ini. Minta Ketua atau Pengelola menambahkannya.",
+    "emptyList": "Belum ada tugas.",
+    "cardCount": "{count} tugas",
+    "moveFailed": "Pemindahan gagal, urutan dikembalikan. Coba lagi ya.",
+    "list": {
+      "menu": "Menu kolom {name}",
+      "rename": "Ubah nama",
+      "name": "Nama kolom",
+      "nameRequired": "Nama kolom jangan dikosongkan ya.",
+      "moveLeft": "Geser ke kiri",
+      "moveRight": "Geser ke kanan",
+      "delete": "Hapus kolom",
+      "deletePrompt": "Hapus kolom ini? Semua tugas di dalamnya ikut hilang dan tidak bisa dikembalikan.",
+      "deleteConfirm": "Ya, hapus kolom",
+      "addOpen": "Tambah kolom",
+      "add": "Tambah",
+      "adding": "Menambahkan…"
+    },
+    "quickAdd": {
+      "open": "Tambah tugas",
+      "label": "Judul tugas",
+      "add": "Tambah",
+      "adding": "Menambahkan…",
+      "required": "Judul tugas jangan dikosongkan ya."
+    },
+    "card": {
+      "drag": "Geser tugas {title}",
+      "formerMember": "Mantan anggota",
+      "due": {
+        "overdue": "Terlambat ({date})",
+        "today": "Hari ini",
+        "upcoming": "{date}"
+      }
+    },
+    "detail": {
+      "title": "Detail tugas",
+      "close": "Tutup",
+      "taskTitle": "Judul tugas",
+      "titleRequired": "Judul tugas jangan dikosongkan ya.",
+      "description": "Deskripsi",
+      "assignee": "Penanggung jawab",
+      "noAssignee": "Belum ditugaskan",
+      "formerMember": "Mantan anggota",
+      "dueDate": "Tenggat",
+      "clearDue": "Hapus tenggat",
+      "save": "Simpan",
+      "saving": "Menyimpan…",
+      "invalid": "Ada isian yang belum benar. Cek lagi ya.",
+      "delete": "Hapus tugas",
+      "deletePrompt": "Hapus tugas ini? Tidak bisa dikembalikan.",
+      "deleteConfirm": "Ya, hapus tugas"
+    },
+    "move": {
+      "title": "Pindahkan tugas",
+      "toList": "Pindahkan ke kolom",
+      "up": "Naikkan",
+      "down": "Turunkan"
+    },
+    "dnd": {
+      "instructions": "Untuk memindahkan tugas, fokuskan pegangan geser lalu tekan spasi. Gunakan tombol panah untuk memilih tempat, lalu tekan spasi lagi untuk menaruhnya. Tekan Esc untuk membatalkan.",
+      "picked": "Tugas {title} diangkat.",
+      "over": "Tugas {title} berada di kolom {target}.",
+      "dropped": "Tugas {title} ditaruh di kolom {target}.",
+      "cancelled": "Pemindahan tugas {title} dibatalkan."
     }
   }
 }

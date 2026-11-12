@@ -187,7 +187,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 - [x] **M0** Repository setup: monorepo, Docker Compose, CI skeleton, health check
 - [x] **M1** Authentication
 - [x] **M2** Groups and projects, invite link and join flow
-- [ ] **M3** Columns and tasks with drag and drop *(first test with classmates)*
+- [x] **M3** Columns and tasks with drag and drop *(first test with classmates)*
 - [ ] **M4** Real-time collaboration
 - [ ] **M5** Comments, activity log, filters
 - [ ] **M6** AI features

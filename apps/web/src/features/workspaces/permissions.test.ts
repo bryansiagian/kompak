@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { canChangeRoles, canManage, canRemoveMember } from './permissions';
+import {
+  canChangeRoles,
+  canDeleteCard,
+  canManage,
+  canRemoveMember,
+} from './permissions';
 
 const owner = { userId: 'o', role: 'OWNER' as const };
 const admin = { userId: 'a', role: 'ADMIN' as const };
@@ -35,5 +40,12 @@ describe('permissions', () => {
   it('Anggota tidak bisa mengeluarkan orang lain, tetapi bisa keluar sendiri', () => {
     expect(canRemoveMember(member, otherMember)).toBe(false);
     expect(canRemoveMember(member, member)).toBe(true);
+  });
+
+  it('tugas hanya bisa dihapus pembuatnya, Pengelola, atau Ketua', () => {
+    expect(canDeleteCard(member, { createdById: 'm' })).toBe(true);
+    expect(canDeleteCard(member, { createdById: 'm2' })).toBe(false);
+    expect(canDeleteCard(admin, { createdById: 'm2' })).toBe(true);
+    expect(canDeleteCard(owner, { createdById: 'm2' })).toBe(true);
   });
 });

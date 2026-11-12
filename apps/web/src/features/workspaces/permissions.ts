@@ -21,3 +21,11 @@ export function canRemoveMember(actor: Actor, target: Actor): boolean {
   if (actor.role === 'OWNER') return true;
   return actor.role === 'ADMIN' && target.role === 'MEMBER';
 }
+
+// Cermin aturan di API (CardsService.remove): pembuat tugas, Pengelola, atau Ketua.
+export function canDeleteCard(
+  actor: Actor,
+  card: { createdById: string },
+): boolean {
+  return card.createdById === actor.userId || canManage(actor.role);
+}
