@@ -10,6 +10,7 @@ import { ConfirmAction } from '@/components/ui/confirm-action';
 import { FormAlert } from '@/components/ui/form-alert';
 import { Section } from '@/components/ui/section';
 import { TextField } from '@/components/ui/text-field';
+import { TextLink } from '@/components/ui/text-link';
 import { workspaceErrorKey } from './errors';
 import {
   useBoards,
@@ -115,7 +116,9 @@ function BoardRow({ board, manage }: { board: Board; manage: boolean }) {
         </form>
       ) : (
         <>
-          <p className="font-medium">{board.name}</p>
+          <TextLink href={`/groups/${board.workspaceId}/projects/${board.id}`}>
+            {board.name}
+          </TextLink>
           {manage ? (
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" onClick={() => setEditing(true)}>
