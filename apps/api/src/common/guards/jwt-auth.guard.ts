@@ -26,6 +26,11 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Soket mengautentikasi dirinya sendiri saat jabat tangan (RealtimeGateway).
+    if (context.getType() !== 'http') {
+      return true;
+    }
+
     const isPublic = this.reflector.getAllAndOverride<boolean | undefined>(
       IS_PUBLIC_KEY,
       [context.getHandler(), context.getClass()],

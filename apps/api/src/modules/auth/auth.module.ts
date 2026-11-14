@@ -26,5 +26,6 @@ import { EmailCodeService } from './email-code.service';
     EmailCodeService,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
+  exports: [JwtModule],
 })
 export class AuthModule {}
