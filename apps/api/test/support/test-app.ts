@@ -16,6 +16,11 @@ export interface TestUser {
   token: string;
 }
 
+export interface TestAppOptions {
+  // Dengarkan di port acak agar klien Socket.IO bisa tersambung.
+  listen?: boolean;
+}
+
 export class TestApp {
   readonly runId = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -25,7 +30,7 @@ export class TestApp {
     readonly mail: FakeMailService,
   ) {}
 
-  static async create(): Promise<TestApp> {
+  static async create(options: TestAppOptions = {}): Promise<TestApp> {
     process.env.RATE_LIMIT_DISABLED = 'true';
     const mail = new FakeMailService();
     const moduleRef = await Test.createTestingModule({
@@ -36,8 +41,22 @@ export class TestApp {
       .compile();
     const app = moduleRef.createNestApplication();
     configureApp(app);
-    await app.init();
+    if (options.listen) {
+      await app.listen(0);
+    } else {
+      await app.init();
+    }
     return new TestApp(app, app.get(PrismaService), mail);
+  }
+
+  get port(): number {
+    const address = this.app.getHttpServer().address() as {
+      port?: number;
+    } | null;
+    if (!address?.port) {
+      throw new Error('The test app is not listening; use create({ listen: true })');
+    }
+    return address.port;
   }
 
   async registerUser(label: string): Promise<TestUser> {
