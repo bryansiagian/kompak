@@ -3,6 +3,7 @@ import type { Board, BoardDetail } from '@kompak/shared';
 import { POSITION_STEP } from '../../common/ordering';
 import { WorkspaceRole } from '../../generated/prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
+import { RealtimeService } from '../realtime/realtime.service';
 import { WorkspaceAccessService } from '../workspaces/workspace-access.service';
 import { toCard, toList } from './board-mappers';
 import { DEFAULT_LIST_NAMES } from './default-lists';
@@ -28,6 +29,7 @@ export class BoardsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly access: WorkspaceAccessService,
+    private readonly realtime: RealtimeService,
   ) {}
 
   // list dan create dipanggil setelah WorkspaceMembershipGuard memverifikasi peran.
@@ -78,16 +80,22 @@ export class BoardsService {
   }
 
   async rename(userId: string, boardId: string, name: string): Promise<Board> {
-    const board = await this.access.requireBoard(
+    const current = await this.access.requireBoard(
       userId,
       boardId,
       MANAGER_ROLES,
     );
     const updated = await this.prisma.board.update({
-      where: { id: board.id },
+      where: { id: current.id },
       data: { name },
     });
-    return toBoard(updated);
+    const board = toBoard(updated);
+    this.realtime.emitToBoard(board.id, {
+      type: 'board.updated',
+      boardId: board.id,
+      board,
+    });
+    return board;
   }
 
   async remove(userId: string, boardId: string): Promise<void> {
@@ -97,5 +105,6 @@ export class BoardsService {
       MANAGER_ROLES,
     );
     await this.prisma.board.delete({ where: { id: board.id } });
+    this.realtime.closeBoard(board.id);
   }
 }
