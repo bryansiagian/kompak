@@ -269,6 +269,16 @@
       "over": "Tugas {title} berada di kolom {target}.",
       "dropped": "Tugas {title} ditaruh di kolom {target}.",
       "cancelled": "Pemindahan tugas {title} dibatalkan."
+    },
+    "realtime": {
+      "viewing": "Sedang membuka papan ini",
+      "more": "+{count}",
+      "reconnecting": "Koneksi terputus. Menyambungkan ulang… Perubahan temanmu mungkin belum terlihat.",
+      "deletedTitle": "Proyek ini sudah dihapus",
+      "deletedBody": "Ketua atau Pengelola menghapus proyek ini. Kembali ke daftar kelompokmu untuk melihat yang lain.",
+      "revokedTitle": "Kamu sudah tidak punya akses",
+      "revokedBody": "Kamu bukan lagi anggota kelompok ini, atau kelompoknya sudah dihapus.",
+      "toHome": "Ke Kelompok saya"
     }
   }
 }

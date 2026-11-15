@@ -188,7 +188,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 - [x] **M1** Authentication
 - [x] **M2** Groups and projects, invite link and join flow
 - [x] **M3** Columns and tasks with drag and drop *(first test with classmates)*
-- [ ] **M4** Real-time collaboration
+- [x] **M4** Real-time collaboration
 - [ ] **M5** Comments, activity log, filters
 - [ ] **M6** AI features
 - [ ] **M7** Public deployment, demo account, screenshots

@@ -28,6 +28,7 @@ import { TextLink } from '@/components/ui/text-link';
 import { RequireAuth } from '@/features/auth/require-auth';
 import { useMembers, useWorkspace } from '@/features/workspaces/hooks';
 import { canManage } from '@/features/workspaces/permissions';
+import { AccessLost } from './access-lost';
 import { AddListForm } from './add-list-form';
 import {
   placementOf,
@@ -37,6 +38,7 @@ import {
 import type { Placement } from './board-cache';
 import { CardDetail } from './card-detail';
 import { CardView } from './card-item';
+import { ConnectionBanner } from './connection-banner';
 import {
   applyDragOver,
   dropPlacement,
@@ -45,6 +47,9 @@ import {
 } from './dnd-helpers';
 import { boardKey, useBoard, useMoveCard, useMoveList } from './hooks';
 import { ListColumn } from './list-column';
+import { othersOf } from './presence';
+import { PresenceBar } from './presence-bar';
+import { useBoardRealtime } from './use-board-realtime';
 
 // Kartu diutamakan daripada kolom pembungkusnya; papan ketik jatuh ke closestCorners.
 const collisionDetection: CollisionDetection = (args) => {
@@ -84,7 +89,8 @@ function BoardContent({ boardId, user }: { boardId: string; user: AuthUser }) {
     );
   }
 
-  return <BoardView board={board.data} user={user} />;
+  // key: berpindah papan mereset status real-time, presence, dan lembar tugas.
+  return <BoardView key={board.data.id} board={board.data} user={user} />;
 }
 
 function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
@@ -94,6 +100,7 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
   const members = useMembers(board.workspaceId);
   const moveCard = useMoveCard(board.id);
   const moveList = useMoveList(board.id);
+  const realtime = useBoardRealtime(board.id, board.workspaceId);
 
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -217,12 +224,22 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
 
   const moveFailed = moveCard.isError || moveList.isError;
 
+  // Proyek dihapus atau akses dicabut oleh orang lain.
+  if (realtime.loss) {
+    return <AccessLost loss={realtime.loss} />;
+  }
+
   return (
     <main className="min-h-dvh px-4 py-5">
       <TextLink href={`/groups/${board.workspaceId}`}>{t('backToGroup')}</TextLink>
-      <h1 className="mt-1 break-words text-2xl font-extrabold tracking-tight">
-        {board.name}
-      </h1>
+      <div className="mt-1 flex items-center justify-between gap-3">
+        <h1 className="min-w-0 break-words text-2xl font-extrabold tracking-tight">
+          {board.name}
+        </h1>
+        <PresenceBar users={othersOf(realtime.presence, user.id)} />
+      </div>
+
+      <ConnectionBanner status={realtime.status} />
 
       {moveFailed ? (
         <div className="mt-3">
