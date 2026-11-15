@@ -88,9 +88,11 @@ Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 - Ordering persists with fractional positions. When the gap between two neighbours becomes too small, the list is renumbered inside the same transaction.
 
 ### 4.4 Real-Time Collaboration (P0)
-
-- Changes (card created/updated/moved/deleted, comment added) appear on other viewers' screens within ~1 second without refresh.
-- Presence: show who is currently viewing the board (P1).
+- Changes (card created/updated/moved/deleted, list created/renamed/moved/deleted, board renamed/deleted) appear on other viewers' screens within ~1 second without refresh.
+- Clients connect with Socket.IO using the access token and join a board room. Only workspace members may join. A removed member, or every member of a deleted workspace, is evicted from the rooms and told through `access.revoked`.
+- Events carry the changed entity (cards include `updatedAt`); moves also carry the ordered ids of the destination container, so clients reorder without computing positions. Clients ignore stale events.
+- After a lost connection the client reconnects, rejoins the board room, and refetches the board.
+- Presence (P1): `presence.updated` lists the distinct users currently viewing the board.
 
 ### 4.5 Comments and Activity (P1)
 
@@ -212,9 +214,9 @@ Indexes: `Card(listId, position)`, `List(boardId, position)`, `WorkspaceMember(u
 | AI         | `POST /cards/:id/ai/subtasks`, `POST /cards/:id/ai/summary`                                                                                |
 | System     | `GET /health`                                                                                                                              |
 
-### WebSocket events (server → client)
-
-`card.created`, `card.updated`, `card.moved`, `card.deleted`, `list.created`, `list.updated`, `list.moved`, `comment.created`, `presence.updated`. Client joins with `board.join { boardId }` (authorized by membership).
+### WebSocket events
+Server → client: `board.updated`, `board.deleted`, `list.created`, `list.updated`, `list.moved`, `list.deleted`, `card.created`, `card.updated`, `card.moved`, `card.deleted`, `comment.created` (M5), `presence.updated`, `access.revoked`.
+Client → server: `board.join { boardId }` (acknowledged; authorized by membership), `board.leave { boardId }`. The handshake carries `auth: { token }` (the access token).
 
 ## 10. Milestones
 

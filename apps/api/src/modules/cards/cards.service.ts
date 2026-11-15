@@ -4,11 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type {
-  Card,
-  MoveCardInput,
-  UpdateCardInput,
-} from '@kompak/shared';
+import type { Card, MoveCardInput, UpdateCardInput } from '@kompak/shared';
 import {
   AnchorNotFoundError,
   appendPosition,
@@ -17,6 +13,7 @@ import {
 import { WorkspaceRole } from '../../generated/prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
 import { toCard } from '../boards/board-mappers';
+import { RealtimeService } from '../realtime/realtime.service';
 import { WorkspaceAccessService } from '../workspaces/workspace-access.service';
 
 const MANAGER_ROLES: readonly WorkspaceRole[] = [
@@ -33,6 +30,7 @@ export class CardsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly access: WorkspaceAccessService,
+    private readonly realtime: RealtimeService,
   ) {}
 
   // Tambah cepat: cukup judul, ditaruh di akhir kolom.
@@ -43,7 +41,7 @@ export class CardsService {
       orderBy: [{ position: 'desc' }, { id: 'desc' }],
       select: { position: true },
     });
-    const card = await this.prisma.card.create({
+    const created = await this.prisma.card.create({
       data: {
         listId: list.id,
         boardId: list.boardId,
@@ -52,7 +50,13 @@ export class CardsService {
         createdById: userId,
       },
     });
-    return toCard(card);
+    const card = toCard(created);
+    this.realtime.emitToBoard(list.boardId, {
+      type: 'card.created',
+      boardId: list.boardId,
+      card,
+    });
+    return card;
   }
 
   async get(userId: string, cardId: string): Promise<Card> {
@@ -64,9 +68,9 @@ export class CardsService {
     cardId: string,
     input: UpdateCardInput,
   ): Promise<Card> {
-    const card = await this.access.requireCard(userId, cardId);
+    const current = await this.access.requireCard(userId, cardId);
     if (input.assigneeId) {
-      await this.assertAssignable(card.workspaceId, input.assigneeId);
+      await this.assertAssignable(current.workspaceId, input.assigneeId);
     }
 
     // undefined = tidak diubah, null = dikosongkan.
@@ -75,7 +79,7 @@ export class CardsService {
         ? input.dueDate
         : parseDate(input.dueDate);
     const updated = await this.prisma.card.update({
-      where: { id: card.id },
+      where: { id: current.id },
       data: {
         title: input.title,
         description: input.description,
@@ -83,7 +87,13 @@ export class CardsService {
         dueDate,
       },
     });
-    return toCard(updated);
+    const card = toCard(updated);
+    this.realtime.emitToBoard(current.boardId, {
+      type: 'card.updated',
+      boardId: current.boardId,
+      card,
+    });
+    return card;
   }
 
   async remove(userId: string, cardId: string): Promise<void> {
@@ -96,6 +106,12 @@ export class CardsService {
       );
     }
     await this.prisma.card.delete({ where: { id: card.id } });
+    this.realtime.emitToBoard(card.boardId, {
+      type: 'card.deleted',
+      boardId: card.boardId,
+      cardId: card.id,
+      listId: card.listId,
+    });
   }
 
   async move(
@@ -103,24 +119,41 @@ export class CardsService {
     cardId: string,
     input: MoveCardInput,
   ): Promise<Card> {
-    const card = await this.access.requireCard(userId, cardId);
+    const current = await this.access.requireCard(userId, cardId);
     // Kolom tujuan harus di proyek yang sama (dan otomatis di kelompok yang sama).
     const target = await this.prisma.list.findFirst({
-      where: { id: input.listId, boardId: card.boardId, archivedAt: null },
+      where: { id: input.listId, boardId: current.boardId, archivedAt: null },
       select: { id: true },
     });
     if (!target) {
       throw new NotFoundException('List not found');
     }
 
+    const moved = await this.persistMove(current.id, target.id, input.beforeCardId);
+    const card = toCard(moved);
+    this.realtime.emitToBoard(current.boardId, {
+      type: 'card.moved',
+      boardId: current.boardId,
+      card,
+      fromListId: current.listId,
+      order: await this.orderedCardIds(target.id),
+    });
+    return card;
+  }
+
+  private async persistMove(
+    cardId: string,
+    targetListId: string,
+    beforeCardId: string | null,
+  ) {
     try {
-      const moved = await this.prisma.$transaction(async (tx) => {
+      return await this.prisma.$transaction(async (tx) => {
         const siblings = await tx.card.findMany({
-          where: { listId: target.id, archivedAt: null, id: { not: card.id } },
+          where: { listId: targetListId, archivedAt: null, id: { not: cardId } },
           orderBy: [{ position: 'asc' }, { id: 'asc' }],
           select: { id: true, position: true },
         });
-        const plan = planInsertion(siblings, input.beforeCardId);
+        const plan = planInsertion(siblings, beforeCardId);
         for (const item of plan.renumbered) {
           await tx.card.update({
             where: { id: item.id },
@@ -128,11 +161,10 @@ export class CardsService {
           });
         }
         return tx.card.update({
-          where: { id: card.id },
-          data: { listId: target.id, position: plan.position },
+          where: { id: cardId },
+          data: { listId: targetListId, position: plan.position },
         });
       });
-      return toCard(moved);
     } catch (error) {
       if (error instanceof AnchorNotFoundError) {
         throw new BadRequestException({
@@ -142,6 +174,15 @@ export class CardsService {
       }
       throw error;
     }
+  }
+
+  private async orderedCardIds(listId: string): Promise<string[]> {
+    const cards = await this.prisma.card.findMany({
+      where: { listId, archivedAt: null },
+      orderBy: [{ position: 'asc' }, { id: 'asc' }],
+      select: { id: true },
+    });
+    return cards.map((card) => card.id);
   }
 
   private async assertAssignable(

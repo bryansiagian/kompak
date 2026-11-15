@@ -5,6 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BoardsModule } from './modules/boards/boards.module';
 import { CardsModule } from './modules/cards/cards.module';
 import { ListsModule } from './modules/lists/lists.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -17,6 +18,7 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     PrismaModule,
     AuthModule,
+    RealtimeModule,
     WorkspacesModule,
     BoardsModule,
     ListsModule,

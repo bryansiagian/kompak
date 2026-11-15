@@ -16,6 +16,7 @@ import type {
 import { Prisma } from '../../generated/prisma/client';
 import { WorkspaceRole } from '../../generated/prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
+import { RealtimeService } from '../realtime/realtime.service';
 import { generateInviteCode } from './invite-code';
 
 const MAX_CODE_ATTEMPTS = 5;
@@ -64,7 +65,10 @@ function toMember(row: {
 // memastikan pemanggil adalah anggota dengan peran yang sesuai.
 @Injectable()
 export class WorkspacesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly realtime: RealtimeService,
+  ) {}
 
   async list(userId: string): Promise<WorkspaceSummary[]> {
     const memberships = await this.prisma.workspaceMember.findMany({
@@ -139,6 +143,7 @@ export class WorkspacesService {
   async remove(workspaceId: string): Promise<void> {
     // Anggota dan proyek ikut terhapus (onDelete: Cascade).
     await this.prisma.workspace.delete({ where: { id: workspaceId } });
+    await this.realtime.revokeAccess(workspaceId);
   }
 
   async listMembers(workspaceId: string): Promise<Member[]> {
@@ -208,6 +213,9 @@ export class WorkspacesService {
     }
 
     await this.prisma.workspaceMember.delete({ where: key });
+    // Soketnya dikeluarkan dari ruang papan kelompok ini agar tidak lagi
+    // menerima peristiwa.
+    await this.realtime.revokeAccess(workspaceId, targetUserId);
   }
 
   async regenerateInvite(workspaceId: string): Promise<InviteCodeResponse> {
