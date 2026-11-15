@@ -48,6 +48,10 @@ export function nextEvent<T extends BoardEventType>(
   predicate: (event: EventOf<T>) => boolean = () => true,
   timeoutMs = 3000,
 ): Promise<EventOf<T>> {
+  // Nama peristiwa sebagai string biasa: tipe pendengar socket.io-client tidak
+  // bisa menyelesaikan nama yang bertipe generik.
+  const eventName: string = type;
+
   return new Promise((resolve, reject) => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const handler = (payload: unknown) => {
@@ -57,14 +61,14 @@ export function nextEvent<T extends BoardEventType>(
         return;
       }
       clearTimeout(timer);
-      socket.off(type, handler);
+      socket.off(eventName, handler);
       resolve(event);
     };
     timer = setTimeout(() => {
-      socket.off(type, handler);
+      socket.off(eventName, handler);
       reject(new Error(`Timed out waiting for ${type}`));
     }, timeoutMs);
-    socket.on(type, handler);
+    socket.on(eventName, handler);
   });
 }
 
@@ -90,12 +94,13 @@ export async function expectNoEvent(
   type: BoardEventType,
   waitMs = 400,
 ): Promise<void> {
+  const eventName: string = type;
   let received = false;
   const handler = () => {
     received = true;
   };
-  socket.on(type, handler);
+  socket.on(eventName, handler);
   await new Promise((resolve) => setTimeout(resolve, waitMs));
-  socket.off(type, handler);
+  socket.off(eventName, handler);
   expect(received).toBe(false);
 }

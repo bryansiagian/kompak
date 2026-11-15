@@ -7,9 +7,12 @@ export class RealtimeIoAdapter extends IoAdapter {
     const origin = process.env.CORS_ORIGIN?.split(',') ?? [
       'http://localhost:3000',
     ];
-    return super.createIOServer(port, {
+    // Menyebarkan options yang opsional membuat semua propertinya opsional,
+    // sedangkan Nest meminta ServerOptions lengkap: hasilnya ditegaskan kembali.
+    const merged = {
       ...options,
       cors: { origin, credentials: true },
-    }) as Server;
+    } as ServerOptions;
+    return super.createIOServer(port, merged) as Server;
   }
 }
