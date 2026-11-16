@@ -7,6 +7,7 @@ import {
 } from '../../common/ordering';
 import { WorkspaceRole } from '../../generated/prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
+import { ActivityService } from '../activity/activity.service';
 import { toList } from '../boards/board-mappers';
 import { RealtimeService } from '../realtime/realtime.service';
 import { WorkspaceAccessService } from '../workspaces/workspace-access.service';
@@ -19,6 +20,7 @@ export class ListsService {
     private readonly prisma: PrismaService,
     private readonly access: WorkspaceAccessService,
     private readonly realtime: RealtimeService,
+    private readonly activity: ActivityService,
   ) {}
 
   async create(userId: string, boardId: string, name: string): Promise<List> {
@@ -45,6 +47,13 @@ export class ListsService {
       boardId: board.id,
       list,
     });
+    await this.activity.record({
+      boardId: board.id,
+      cardId: null,
+      actorId: userId,
+      type: 'list.created',
+      payload: { name: list.name },
+    });
     return list;
   }
 
@@ -60,6 +69,15 @@ export class ListsService {
       boardId: current.boardId,
       list,
     });
+    if (current.name !== list.name) {
+      await this.activity.record({
+        boardId: current.boardId,
+        cardId: null,
+        actorId: userId,
+        type: 'list.renamed',
+        payload: { from: current.name, to: list.name },
+      });
+    }
     return list;
   }
 
@@ -71,6 +89,13 @@ export class ListsService {
       type: 'list.deleted',
       boardId: list.boardId,
       listId: list.id,
+    });
+    await this.activity.record({
+      boardId: list.boardId,
+      cardId: null,
+      actorId: userId,
+      type: 'list.deleted',
+      payload: { name: list.name },
     });
   }
 
