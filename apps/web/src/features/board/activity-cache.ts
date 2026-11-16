@@ -34,7 +34,10 @@ export function prependActivity(
   return { ...data, pages: [[activity, ...first].sort(newestFirst), ...rest] };
 }
 
-export function flattenActivityPages(data: ActivityPages): Activity[] {
+// Hanya membaca `pages`, jadi tipe parameter halaman (pageParams) tidak dipersoalkan.
+export function flattenActivityPages(data: {
+  pages: readonly (readonly Activity[])[];
+}): Activity[] {
   const seen = new Set<string>();
   const result: Activity[] = [];
   for (const page of data.pages) {
