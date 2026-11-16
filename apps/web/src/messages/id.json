@@ -279,6 +279,44 @@
       "revokedTitle": "Kamu sudah tidak punya akses",
       "revokedBody": "Kamu bukan lagi anggota kelompok ini, atau kelompoknya sudah dihapus.",
       "toHome": "Ke Kelompok saya"
+    },
+    "comments": {
+      "title": "Komentar",
+      "empty": "Belum ada komentar. Tulis yang pertama.",
+      "label": "Tulis komentar",
+      "send": "Kirim",
+      "sending": "Mengirim…",
+      "required": "Komentar jangan dikosongkan ya.",
+      "edit": "Ubah",
+      "editLabel": "Ubah komentar",
+      "edited": "(diubah)",
+      "delete": "Hapus",
+      "deletePrompt": "Hapus komentar ini?",
+      "deleteConfirm": "Ya, hapus komentar"
+    },
+    "activity": {
+      "open": "Riwayat",
+      "close": "Tutup",
+      "boardTitle": "Riwayat proyek",
+      "cardTitle": "Riwayat tugas",
+      "empty": "Belum ada aktivitas.",
+      "loadMore": "Muat lebih lama",
+      "loadingMore": "Memuat…",
+      "items": {
+        "cardCreated": "{actor} membuat tugas “{title}” di kolom {listName}.",
+        "cardRenamed": "{actor} mengganti judul tugas “{from}” menjadi “{to}”.",
+        "cardDescribed": "{actor} mengubah deskripsi tugas “{title}”.",
+        "cardAssigned": "{actor} menugaskan “{title}” kepada {assignee}.",
+        "cardUnassigned": "{actor} mengosongkan penanggung jawab tugas “{title}”.",
+        "cardDueChanged": "{actor} mengatur tenggat tugas “{title}” ke {date}.",
+        "cardDueCleared": "{actor} menghapus tenggat tugas “{title}”.",
+        "cardMoved": "{actor} memindahkan “{title}” dari {from} ke {to}.",
+        "cardDeleted": "{actor} menghapus tugas “{title}”.",
+        "commentAdded": "{actor} berkomentar di “{title}”: {excerpt}",
+        "listCreated": "{actor} menambah kolom {name}.",
+        "listRenamed": "{actor} mengganti nama kolom {from} menjadi {to}.",
+        "listDeleted": "{actor} menghapus kolom {name}."
+      }
     }
   }
 }
