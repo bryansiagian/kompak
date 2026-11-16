@@ -47,6 +47,49 @@ describe('board dan presence', () => {
     ).toBe(board);
     expect(apply(board, { type: 'board.deleted', boardId: 'b1' })).toBe(board);
   });
+
+    it('peristiwa komentar dan riwayat tidak mengubah cache papan', () => {
+    const board = makeBoard();
+    const comment = {
+      id: 'k1',
+      cardId: 'a',
+      authorId: 'u1',
+      authorName: 'Ani',
+      body: 'Halo',
+      createdAt: NEWER,
+      updatedAt: NEWER,
+    };
+    expect(
+      apply(board, { type: 'comment.created', boardId: 'b1', comment }),
+    ).toBe(board);
+    expect(
+      apply(board, { type: 'comment.updated', boardId: 'b1', comment }),
+    ).toBe(board);
+    expect(
+      apply(board, {
+        type: 'comment.deleted',
+        boardId: 'b1',
+        commentId: 'k1',
+        cardId: 'a',
+      }),
+    ).toBe(board);
+    expect(
+      apply(board, {
+        type: 'activity.created',
+        boardId: 'b1',
+        activity: {
+          id: 'r1',
+          boardId: 'b1',
+          cardId: 'a',
+          actorId: 'u1',
+          actorName: 'Ani',
+          createdAt: NEWER,
+          type: 'card.deleted',
+          payload: { title: 'A' },
+        },
+      }),
+    ).toBe(board);
+  });
 });
 
 describe('kolom', () => {
