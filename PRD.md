@@ -95,9 +95,11 @@ Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 - Presence (P1): `presence.updated` lists the distinct users currently viewing the board.
 
 ### 4.5 Comments and Activity (P1)
-
-- Threaded-free comments on cards (flat list), edit/delete own comment.
-- Activity log per card and per board (who did what, when).
+- Flat (no threads) comments on cards, up to 2000 characters. Any member can read and write comments. Only the author edits a comment; the author, an ADMIN, or the OWNER can delete it (moderation).
+- Comment changes are broadcast in real time to everyone viewing the board.
+- Activity log per card and per board (who did what, when): card created, renamed, description changed, assignee changed, due date changed, moved to another column, deleted; comment added; column created, renamed, deleted. Reordering inside a column is not logged.
+- Entries snapshot names (card titles, column names) at the time of the event, so they stay readable after renames, and they survive the deletion of the card. The board feed is paginated, newest first.
+- Activity is a best-effort record: failing to record it never fails the user's action.
 
 ### 4.6 Search and Filters (P1)
 
@@ -210,12 +212,13 @@ Indexes: `Card(listId, position)`, `List(boardId, position)`, `WorkspaceMember(u
 | Boards | `GET/POST /workspaces/:id/boards`, `GET/PATCH/DELETE /boards/:id` (GET returns lists + cards)                                                  |
 | Lists | `POST /boards/:id/lists`, `PATCH/DELETE /lists/:id`, `PATCH /lists/:id/move` (body: `beforeListId`)                                             |
 | Cards | `POST /lists/:id/cards`, `GET/PATCH/DELETE /cards/:id`, `PATCH /cards/:id/move` (body: `listId`, `beforeCardId`)                                |
-| Comments   | `GET/POST /cards/:id/comments`, `PATCH/DELETE /comments/:id`                                                                               |
+| Comments | `GET/POST /cards/:id/comments`, `PATCH/DELETE /comments/:id`                                                                                 |
+| Activity | `GET /boards/:id/activity`, `GET /cards/:id/activity` (query: `limit`, `before`)                                                             |
 | AI         | `POST /cards/:id/ai/subtasks`, `POST /cards/:id/ai/summary`                                                                                |
 | System     | `GET /health`                                                                                                                              |
 
 ### WebSocket events
-Server → client: `board.updated`, `board.deleted`, `list.created`, `list.updated`, `list.moved`, `list.deleted`, `card.created`, `card.updated`, `card.moved`, `card.deleted`, `comment.created` (M5), `presence.updated`, `access.revoked`.
+Server → client: `board.updated`, `board.deleted`, `list.created`, `list.updated`, `list.moved`, `list.deleted`, `card.created`, `card.updated`, `card.moved`, `card.deleted`, `comment.created`, `comment.updated`, `comment.deleted`, `activity.created`, `presence.updated`, `access.revoked`.
 Client → server: `board.join { boardId }` (acknowledged; authorized by membership), `board.leave { boardId }`. The handshake carries `auth: { token }` (the access token).
 
 ## 10. Milestones
