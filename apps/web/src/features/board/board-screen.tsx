@@ -30,6 +30,7 @@ import { useMembers, useWorkspace } from '@/features/workspaces/hooks';
 import { canManage } from '@/features/workspaces/permissions';
 import { AccessLost } from './access-lost';
 import { AddListForm } from './add-list-form';
+import { BoardActivityButton } from './board-activity-panel';
 import {
   placementOf,
   samePlacement,
@@ -237,6 +238,10 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
           {board.name}
         </h1>
         <PresenceBar users={othersOf(realtime.presence, user.id)} />
+      </div>
+
+      <div className="mt-3">
+        <BoardActivityButton boardId={board.id} />
       </div>
 
       <ConnectionBanner status={realtime.status} />

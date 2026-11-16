@@ -2,12 +2,27 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import type { BoardDetail, PresenceUser } from '@kompak/shared';
+import type {
+  Activity,
+  BoardDetail,
+  Comment,
+  PresenceUser,
+} from '@kompak/shared';
 import { workspacesKey } from '@/features/workspaces/hooks';
 import { getRealtimeClient } from '@/lib/realtime/browser';
 import type { BoardWatcher, ConnectionStatus } from '@/lib/realtime/client';
 import type { RealtimeLoss } from './access-lost';
+import { prependActivity, upsertActivity } from './activity-cache';
+import type { ActivityPages } from './activity-cache';
+import {
+  CARD_ACTIVITY_LIMIT,
+  boardActivityKey,
+  cardActivityKey,
+  cardActivityRootKey,
+} from './activity-hooks';
 import { applyBoardEvent } from './board-events';
+import { commentEventCardId, applyCommentEvent } from './comments-cache';
+import { commentsKey, commentsRootKey } from './comment-hooks';
 import { boardKey } from './hooks';
 
 // Menerapkan peristiwa real-time papan ke cache, melacak presence dan status koneksi.
@@ -33,9 +48,44 @@ export function useBoardRealtime(boardId: string, workspaceId: string) {
         if (lost) {
           return;
         }
-        if (event.type === 'board.deleted') {
-          lose('deleted');
-          return;
+
+        switch (event.type) {
+          case 'board.deleted':
+            lose('deleted');
+            return;
+
+          // Komentar dan riwayat hanya diterapkan ke cache yang sedang ada;
+          // yang belum pernah dibuka akan diambil segar saat dibuka.
+          case 'comment.created':
+          case 'comment.updated':
+          case 'comment.deleted':
+            queryClient.setQueryData<Comment[]>(
+              commentsKey(commentEventCardId(event)),
+              (current) =>
+                current ? applyCommentEvent(current, event) : current,
+            );
+            return;
+
+          case 'activity.created': {
+            const { activity } = event;
+            queryClient.setQueryData<ActivityPages>(
+              boardActivityKey(boardId),
+              (current) => (current ? prependActivity(current, activity) : current),
+            );
+            if (activity.cardId) {
+              queryClient.setQueryData<Activity[]>(
+                cardActivityKey(activity.cardId),
+                (current) =>
+                  current
+                    ? upsertActivity(current, activity, CARD_ACTIVITY_LIMIT)
+                    : current,
+              );
+            }
+            return;
+          }
+
+          default:
+            break;
         }
 
         const current = queryClient.getQueryData<BoardDetail>(key);
@@ -55,9 +105,15 @@ export function useBoardRealtime(boardId: string, workspaceId: string) {
       // Menutup celah antara pengambilan data dan bergabung ke ruang, dan
       // menyegarkan data setelah koneksi putus lalu tersambung lagi.
       onSynced: () => {
-        if (!lost) {
-          void queryClient.invalidateQueries({ queryKey: key });
+        if (lost) {
+          return;
         }
+        void queryClient.invalidateQueries({ queryKey: key });
+        void queryClient.invalidateQueries({ queryKey: commentsRootKey });
+        void queryClient.invalidateQueries({ queryKey: cardActivityRootKey });
+        void queryClient.invalidateQueries({
+          queryKey: boardActivityKey(boardId),
+        });
       },
       onRevoked: () => {
         if (!lost) {

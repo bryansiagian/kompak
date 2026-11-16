@@ -14,6 +14,7 @@ import { TextField } from '@/components/ui/text-field';
 import { workspaceErrorKey } from '@/features/workspaces/errors';
 import { canDeleteCard } from '@/features/workspaces/permissions';
 import type { Placement } from './board-cache';
+import { CardCollaboration } from './card-collaboration';
 import { CardMoveControls } from './card-move-controls';
 import { useDeleteCard, useUpdateCard } from './hooks';
 
@@ -158,6 +159,8 @@ export function CardDetail({
             {update.isPending ? t('saving') : t('save')}
           </Button>
         </form>
+
+        <CardCollaboration cardId={card.id} viewer={viewer} />
 
         <CardMoveControls board={board} card={card} onMove={onMove} />
 
