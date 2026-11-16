@@ -9,4 +9,6 @@ export type HealthResponse = z.infer<typeof healthResponseSchema>;
 export * from './auth';
 export * from './workspace';
 export * from './kanban';
+export * from './comment';
+export * from './activity';
 export * from './realtime';

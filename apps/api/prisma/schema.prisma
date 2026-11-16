@@ -30,6 +30,8 @@ model User {
   memberships     WorkspaceMember[]
   assignedCards   Card[]            @relation("CardAssignee")
   createdCards    Card[]            @relation("CardCreator")
+  comments        Comment[]         @relation("CommentAuthor")
+  activities      Activity[]        @relation("ActivityActor")
 }
 
 model RefreshToken {
@@ -79,14 +81,15 @@ model WorkspaceMember {
 }
 
 model Board {
-  id          String    @id @default(uuid())
+  id          String     @id @default(uuid())
   workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   name        String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime   @default(now())
   archivedAt  DateTime?
   lists       List[]
   cards       Card[]
+  activities  Activity[]
 
   @@index([workspaceId])
 }
@@ -120,7 +123,37 @@ model Card {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   archivedAt  DateTime?
+  comments    Comment[]
 
   @@index([listId, position])
   @@index([boardId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cardId, createdAt])
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  // Sengaja tanpa relasi: riwayat tugas yang sudah dihapus tetap tersimpan.
+  cardId    String?
+  actorId   String
+  actor     User     @relation("ActivityActor", fields: [actorId], references: [id], onDelete: Cascade)
+  type      String
+  payload   Json
+  createdAt DateTime @default(now())
+
+  @@index([boardId, createdAt])
+  @@index([cardId, createdAt])
 }

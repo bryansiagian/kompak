@@ -12,9 +12,11 @@ import {
 } from '../../common/ordering';
 import { WorkspaceRole } from '../../generated/prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
-import { toCard } from '../boards/board-mappers';
+import { ActivityService } from '../activity/activity.service';
+import { formatDate, toCard } from '../boards/board-mappers';
 import { RealtimeService } from '../realtime/realtime.service';
 import { WorkspaceAccessService } from '../workspaces/workspace-access.service';
+import type { CardRecord } from '../workspaces/workspace-access.service';
 
 const MANAGER_ROLES: readonly WorkspaceRole[] = [
   WorkspaceRole.OWNER,
@@ -31,6 +33,7 @@ export class CardsService {
     private readonly prisma: PrismaService,
     private readonly access: WorkspaceAccessService,
     private readonly realtime: RealtimeService,
+    private readonly activity: ActivityService,
   ) {}
 
   // Tambah cepat: cukup judul, ditaruh di akhir kolom.
@@ -55,6 +58,13 @@ export class CardsService {
       type: 'card.created',
       boardId: list.boardId,
       card,
+    });
+    await this.activity.record({
+      boardId: list.boardId,
+      cardId: card.id,
+      actorId: userId,
+      type: 'card.created',
+      payload: { title: card.title, listName: list.name },
     });
     return card;
   }
@@ -93,6 +103,7 @@ export class CardsService {
       boardId: current.boardId,
       card,
     });
+    await this.recordUpdates(userId, current, card);
     return card;
   }
 
@@ -112,6 +123,13 @@ export class CardsService {
       cardId: card.id,
       listId: card.listId,
     });
+    await this.activity.record({
+      boardId: card.boardId,
+      cardId: card.id,
+      actorId: userId,
+      type: 'card.deleted',
+      payload: { title: card.title },
+    });
   }
 
   async move(
@@ -123,7 +141,7 @@ export class CardsService {
     // Kolom tujuan harus di proyek yang sama (dan otomatis di kelompok yang sama).
     const target = await this.prisma.list.findFirst({
       where: { id: input.listId, boardId: current.boardId, archivedAt: null },
-      select: { id: true },
+      select: { id: true, name: true },
     });
     if (!target) {
       throw new NotFoundException('List not found');
@@ -138,7 +156,70 @@ export class CardsService {
       fromListId: current.listId,
       order: await this.orderedCardIds(target.id),
     });
+
+    // Hanya pindah kolom yang dicatat; mengurutkan ulang di kolom yang sama tidak.
+    if (current.listId !== target.id) {
+      const from = await this.prisma.list.findUnique({
+        where: { id: current.listId },
+        select: { name: true },
+      });
+      await this.activity.record({
+        boardId: current.boardId,
+        cardId: current.id,
+        actorId: userId,
+        type: 'card.moved',
+        payload: {
+          title: card.title,
+          fromListName: from?.name ?? '',
+          toListName: target.name,
+        },
+      });
+    }
     return card;
+  }
+
+  // Satu perubahan bisa menghasilkan beberapa catatan; kolom yang nilainya sama dilewati.
+  private async recordUpdates(
+    actorId: string,
+    before: CardRecord,
+    after: Card,
+  ): Promise<void> {
+    const base = { boardId: before.boardId, cardId: before.id, actorId };
+
+    if (after.title !== before.title) {
+      await this.activity.record({
+        ...base,
+        type: 'card.renamed',
+        payload: { from: before.title, to: after.title },
+      });
+    }
+    if (after.description !== before.description) {
+      await this.activity.record({
+        ...base,
+        type: 'card.described',
+        payload: { title: after.title },
+      });
+    }
+    if (after.assigneeId !== before.assigneeId) {
+      const assignee = after.assigneeId
+        ? await this.prisma.user.findUnique({
+            where: { id: after.assigneeId },
+            select: { name: true },
+          })
+        : null;
+      await this.activity.record({
+        ...base,
+        type: 'card.assigned',
+        payload: { title: after.title, assigneeName: assignee?.name ?? null },
+      });
+    }
+    if (after.dueDate !== formatDate(before.dueDate)) {
+      await this.activity.record({
+        ...base,
+        type: 'card.due_changed',
+        payload: { title: after.title, dueDate: after.dueDate },
+      });
+    }
   }
 
   private async persistMove(

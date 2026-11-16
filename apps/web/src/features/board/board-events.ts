@@ -97,6 +97,10 @@ export function applyBoardEvent(
   switch (event.type) {
     case 'presence.updated':
     case 'board.deleted':
+    case 'comment.created':
+    case 'comment.updated':
+    case 'comment.deleted':
+    case 'activity.created':
       return board;
 
     case 'board.updated':
