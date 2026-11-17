@@ -10,7 +10,7 @@ export interface Parser<T> {
   parse(data: unknown): T;
 }
 
-type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 interface SendOptions {
   method?: HttpMethod;
