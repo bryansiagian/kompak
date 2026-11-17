@@ -29,6 +29,14 @@ export const activityDetailSchema = z.discriminatedUnion('type', [
     payload: z.object({ title: z.string(), dueDate: z.string().nullable() }),
   }),
   z.object({
+    type: z.literal('card.labels_changed'),
+    payload: z.object({
+      title: z.string(),
+      added: z.array(z.string()),
+      removed: z.array(z.string()),
+    }),
+  }),
+  z.object({
     type: z.literal('card.moved'),
     payload: z.object({
       title: z.string(),
