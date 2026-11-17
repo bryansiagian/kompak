@@ -9,6 +9,9 @@ export type ActivityMessageKey =
   | 'cardUnassigned'
   | 'cardDueChanged'
   | 'cardDueCleared'
+  | 'cardLabelsAdded'
+  | 'cardLabelsRemoved'
+  | 'cardLabelsChanged'
   | 'cardMoved'
   | 'cardDeleted'
   | 'commentAdded'
@@ -73,6 +76,27 @@ export function describeActivity(activity: Activity): ActivityMessage {
               date: formatDueDate(activity.payload.dueDate),
             },
           };
+    case 'card.labels_changed': {
+      const { title, added, removed } = activity.payload;
+      const addedText = added.join(', ');
+      const removedText = removed.join(', ');
+      if (removed.length === 0) {
+        return {
+          key: 'cardLabelsAdded',
+          values: { actor, title, added: addedText },
+        };
+      }
+      if (added.length === 0) {
+        return {
+          key: 'cardLabelsRemoved',
+          values: { actor, title, removed: removedText },
+        };
+      }
+      return {
+        key: 'cardLabelsChanged',
+        values: { actor, title, added: addedText, removed: removedText },
+      };
+    }
     case 'card.moved':
       return {
         key: 'cardMoved',
