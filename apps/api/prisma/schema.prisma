@@ -136,7 +136,7 @@ model Label {
   boardId   String
   board     Board       @relation(fields: [boardId], references: [id], onDelete: Cascade)
   name      String
-  // Kunci warna dari palet tetap yang nantinya ditentukan di @kompak/shared.
+  // Kunci palet tetap (lihat LABEL_COLORS di @kompak/shared).
   color     String
   createdAt DateTime    @default(now())
   cards     CardLabel[]
