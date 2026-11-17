@@ -8,16 +8,19 @@ import {
   Param,
   Patch,
   Post,
+  Put,
 } from '@nestjs/common';
 import {
   createCardSchema,
   moveCardSchema,
+  setCardLabelsSchema,
   updateCardSchema,
 } from '@kompak/shared';
 import type {
   Card,
   CreateCardInput,
   MoveCardInput,
+  SetCardLabelsInput,
   UpdateCardInput,
 } from '@kompak/shared';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -53,6 +56,15 @@ export class CardsController {
     @Body(new ZodValidationPipe(updateCardSchema)) body: UpdateCardInput,
   ): Promise<Card> {
     return this.cards.update(user.id, cardId, body);
+  }
+
+  @Put('cards/:cardId/labels')
+  setLabels(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('cardId') cardId: string,
+    @Body(new ZodValidationPipe(setCardLabelsSchema)) body: SetCardLabelsInput,
+  ): Promise<Card> {
+    return this.cards.setLabels(user.id, cardId, body.labelIds);
   }
 
   @Delete('cards/:cardId')

@@ -9,6 +9,7 @@ export function makeCard(id: string, listId: string): Card {
     description: '',
     assigneeId: null,
     dueDate: null,
+    labelIds: [],
     position: 0,
     createdById: 'u1',
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -23,6 +24,7 @@ export function makeBoard(): BoardDetail {
     workspaceId: 'w1',
     name: 'Papan',
     createdAt: '2026-01-01T00:00:00.000Z',
+    labels: [],
     lists: [
       {
         id: 'todo',

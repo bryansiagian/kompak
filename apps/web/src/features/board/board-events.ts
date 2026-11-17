@@ -77,9 +77,26 @@ function patchCard(board: BoardDetail, card: Card): BoardDetail {
               description: card.description,
               assigneeId: card.assigneeId,
               dueDate: card.dueDate,
+              labelIds: card.labelIds,
               updatedAt: card.updatedAt,
             }
           : item,
+      ),
+    })),
+  };
+}
+
+// Label dihapus: lepaskan dari semua tugas di cache.
+function stripLabel(board: BoardDetail, labelId: string): BoardDetail {
+  return {
+    ...board,
+    labels: board.labels.filter((label) => label.id !== labelId),
+    lists: board.lists.map((list) => ({
+      ...list,
+      cards: list.cards.map((card) =>
+        card.labelIds.includes(labelId)
+          ? { ...card, labelIds: card.labelIds.filter((id) => id !== labelId) }
+          : card,
       ),
     })),
   };
@@ -95,6 +112,8 @@ export function applyBoardEvent(
   event: BoardEvent,
 ): BoardDetail | null {
   switch (event.type) {
+    // Komentar dan riwayat tidak ada di cache papan; layar detail tugas dan
+    // panel riwayat menanganinya sendiri.
     case 'presence.updated':
     case 'board.deleted':
     case 'comment.created':
@@ -107,6 +126,29 @@ export function applyBoardEvent(
       return board.name === event.board.name
         ? board
         : { ...board, name: event.board.name };
+
+    case 'label.created':
+      return board.labels.some((label) => label.id === event.label.id)
+        ? board
+        : { ...board, labels: [...board.labels, event.label] };
+
+    case 'label.updated':
+      return board.labels.some((label) => label.id === event.label.id)
+        ? {
+            ...board,
+            labels: board.labels.map((label) =>
+              label.id === event.label.id ? event.label : label,
+            ),
+          }
+        : null;
+
+    case 'label.deleted': {
+      const known = board.labels.some((label) => label.id === event.labelId);
+      const used = board.lists.some((list) =>
+        list.cards.some((card) => card.labelIds.includes(event.labelId)),
+      );
+      return known || used ? stripLabel(board, event.labelId) : board;
+    }
 
     case 'list.created':
       return board.lists.some((list) => list.id === event.list.id)

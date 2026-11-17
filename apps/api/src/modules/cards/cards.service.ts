@@ -23,6 +23,8 @@ const MANAGER_ROLES: readonly WorkspaceRole[] = [
   WorkspaceRole.ADMIN,
 ];
 
+const WITH_LABELS = { labels: { select: { labelId: true } } } as const;
+
 function parseDate(value: string): Date {
   return new Date(`${value}T00:00:00.000Z`);
 }
@@ -52,6 +54,7 @@ export class CardsService {
         position: appendPosition(last?.position ?? null),
         createdById: userId,
       },
+      include: WITH_LABELS,
     });
     const card = toCard(created);
     this.realtime.emitToBoard(list.boardId, {
@@ -96,6 +99,7 @@ export class CardsService {
         assigneeId: input.assigneeId,
         dueDate,
       },
+      include: WITH_LABELS,
     });
     const card = toCard(updated);
     this.realtime.emitToBoard(current.boardId, {
@@ -104,6 +108,76 @@ export class CardsService {
       card,
     });
     await this.recordUpdates(userId, current, card);
+    return card;
+  }
+
+  // Mengganti seluruh himpunan label tugas. Idempoten: himpunan yang sama tidak
+  // mengubah apa pun dan tidak dicatat.
+  async setLabels(
+    userId: string,
+    cardId: string,
+    labelIds: string[],
+  ): Promise<Card> {
+    const current = await this.access.requireCard(userId, cardId);
+    const unique = [...new Set(labelIds)];
+
+    const boardLabels = await this.prisma.label.findMany({
+      where: { boardId: current.boardId },
+      select: { id: true, name: true },
+    });
+    const nameOf = new Map(boardLabels.map((label) => [label.id, label.name]));
+    if (unique.some((id) => !nameOf.has(id))) {
+      throw new BadRequestException({
+        message: 'Labels must belong to the same board as the task',
+        code: 'LABEL_NOT_ON_BOARD',
+      });
+    }
+
+    const previous = new Set(current.labels.map((item) => item.labelId));
+    const next = new Set(unique);
+    const added = unique.filter((id) => !previous.has(id));
+    const removed = [...previous].filter((id) => !next.has(id));
+    if (added.length === 0 && removed.length === 0) {
+      return toCard(current);
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      if (removed.length > 0) {
+        await tx.cardLabel.deleteMany({
+          where: { cardId: current.id, labelId: { in: removed } },
+        });
+      }
+      if (added.length > 0) {
+        await tx.cardLabel.createMany({
+          data: added.map((labelId) => ({ cardId: current.id, labelId })),
+          skipDuplicates: true,
+        });
+      }
+      // Menaikkan updatedAt agar penjaga peristiwa basi di klien tetap benar.
+      return tx.card.update({
+        where: { id: current.id },
+        data: { updatedAt: new Date() },
+        include: WITH_LABELS,
+      });
+    });
+
+    const card = toCard(updated);
+    this.realtime.emitToBoard(current.boardId, {
+      type: 'card.updated',
+      boardId: current.boardId,
+      card,
+    });
+    await this.activity.record({
+      boardId: current.boardId,
+      cardId: current.id,
+      actorId: userId,
+      type: 'card.labels_changed',
+      payload: {
+        title: card.title,
+        added: added.map((id) => nameOf.get(id) ?? ''),
+        removed: removed.map((id) => nameOf.get(id) ?? ''),
+      },
+    });
     return card;
   }
 
@@ -244,6 +318,7 @@ export class CardsService {
         return tx.card.update({
           where: { id: cardId },
           data: { listId: targetListId, position: plan.position },
+          include: WITH_LABELS,
         });
       });
     } catch (error) {

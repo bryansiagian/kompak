@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { activitySchema } from './activity';
 import { commentSchema } from './comment';
 import { cardSchema, listSchema } from './kanban';
+import { labelSchema } from './label';
 import { boardSchema } from './workspace';
 
 export const BOARD_JOIN_EVENT = 'board.join';
@@ -83,6 +84,21 @@ export const boardEventSchema = z.discriminatedUnion('type', [
     boardId: z.string(),
     cardId: z.string(),
     listId: z.string(),
+  }),
+  z.object({
+    type: z.literal('label.created'),
+    boardId: z.string(),
+    label: labelSchema,
+  }),
+  z.object({
+    type: z.literal('label.updated'),
+    boardId: z.string(),
+    label: labelSchema,
+  }),
+  z.object({
+    type: z.literal('label.deleted'),
+    boardId: z.string(),
+    labelId: z.string(),
   }),
   z.object({
     type: z.literal('comment.created'),

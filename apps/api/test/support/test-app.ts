@@ -77,25 +77,40 @@ export class TestApp {
     return { id: body.user.id, email, token: body.accessToken };
   }
 
+  
   // Permintaan dengan access token pengguna tertentu.
   as(token: string) {
     const server = this.app.getHttpServer();
     const header = `Bearer ${token}`;
+
     return {
       get: (path: string) =>
-        request(server).get(`${API}${path}`).set('Authorization', header),
+        request(server)
+          .get(`${API}${path}`)
+          .set('Authorization', header),
+
       post: (path: string, body: object = {}) =>
         request(server)
           .post(`${API}${path}`)
           .set('Authorization', header)
           .send(body),
+
+      put: (path: string, body: object = {}) =>
+        request(server)
+          .put(`${API}${path}`)
+          .set('Authorization', header)
+          .send(body),
+
       patch: (path: string, body: object = {}) =>
         request(server)
           .patch(`${API}${path}`)
           .set('Authorization', header)
           .send(body),
+
       delete: (path: string) =>
-        request(server).delete(`${API}${path}`).set('Authorization', header),
+        request(server)
+          .delete(`${API}${path}`)
+          .set('Authorization', header),
     };
   }
 

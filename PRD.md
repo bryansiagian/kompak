@@ -81,8 +81,7 @@ Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 ### 4.3 Boards, Lists, Cards (P0)
 - A workspace has many boards; a board has ordered lists; a list has ordered cards.
 - A new board starts with three lists: Belum dikerjakan, Sedang dikerjakan, Selesai.
-- Card fields: title, description (markdown), assignee (must be a workspace member), due date (a calendar date, no time), position. Labels move to M5 together with filters.
-- Quick-add: a card needs only a title and is appended to the end of its list.
+- Card fields: title, description (markdown), assignee (must be a workspace member), due date (a calendar date, no time), labels (up to 10, chosen from the board's labels), position.- Quick-add: a card needs only a title and is appended to the end of its list.
 - Lists (columns) are managed by OWNER and ADMIN: create, rename, delete, reorder. Any member creates, edits, and moves cards. A card can be deleted by its creator, an ADMIN, or the OWNER.
 - Drag and drop to reorder cards within a list and move across lists, and to reorder lists. Moves are anchor-based ("insert before card X, or at the end") so they stay correct when someone else changed the list in the meantime.
 - Ordering persists with fractional positions. When the gap between two neighbours becomes too small, the list is renumbered inside the same transaction.
@@ -103,8 +102,9 @@ Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 
 ### 4.6 Search and Filters (P1)
 
-- Filter board by assignee, label, due date.
-- Text search across cards in a workspace.
+- Labels belong to a board: a name (up to 30 characters) and a color from a fixed palette, up to 30 labels per board. OWNER and ADMIN manage them; any member attaches labels to cards (up to 10 per card). Deleting a label removes it from every card.
+- Filter the board by assignee, label, and due date (overdue, today, this week). Filtering runs in the browser on the data already loaded.
+- Text search across the cards of a workspace (title and description, case-insensitive, at least 2 characters), most recently updated first. Only members of the workspace can search it.
 
 ### 4.7 AI Features (P1)
 
@@ -194,8 +194,8 @@ Board(id, workspaceId, name, createdAt, archivedAt)
 List(id, boardId, name, position, archivedAt)
 Card(id, listId, boardId, title, description, assigneeId?, dueDate?, position,
      createdById, createdAt, updatedAt, archivedAt)
-Label(id, boardId, name, color)          -- arrives in M5
-CardLabel(cardId, labelId)               -- arrives in M5
+Label(id, boardId, name, color)
+CardLabel(cardId, labelId)               -- PK (cardId, labelId)
 Comment(id, cardId, authorId, body, createdAt, updatedAt)
 Activity(id, boardId, cardId?, actorId, type, payload JSON, createdAt)
 ```
@@ -216,10 +216,13 @@ Indexes: `Card(listId, position)`, `List(boardId, position)`, `WorkspaceMember(u
 | Activity | `GET /boards/:id/activity`, `GET /cards/:id/activity` (query: `limit`, `before`)                                                             |
 | AI         | `POST /cards/:id/ai/subtasks`, `POST /cards/:id/ai/summary`                                                                                |
 | System     | `GET /health`                                                                                                                              |
+| Labels | `POST /boards/:id/labels`, `PATCH/DELETE /labels/:id`, `PUT /cards/:id/labels` (replaces the card's label set)                                 |
+| Search | `GET /workspaces/:id/search?q=&limit=`                                                                                                         |
 
 ### WebSocket events
 Server → client: `board.updated`, `board.deleted`, `list.created`, `list.updated`, `list.moved`, `list.deleted`, `card.created`, `card.updated`, `card.moved`, `card.deleted`, `comment.created`, `comment.updated`, `comment.deleted`, `activity.created`, `presence.updated`, `access.revoked`.
 Client → server: `board.join { boardId }` (acknowledged; authorized by membership), `board.leave { boardId }`. The handshake carries `auth: { token }` (the access token).
+label.created, label.updated, label.deleted
 
 ## 10. Milestones
 

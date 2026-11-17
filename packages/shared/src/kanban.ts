@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { labelSchema } from './label';
 import { boardSchema } from './workspace';
 
 export const CARD_TITLE_MAX = 200;
@@ -66,6 +67,7 @@ export const cardSchema = z.object({
   description: z.string(),
   assigneeId: z.string().nullable(),
   dueDate: z.string().nullable(),
+  labelIds: z.array(z.string()),
   position: z.number(),
   createdById: z.string(),
   createdAt: z.string(),
@@ -79,6 +81,7 @@ export const listWithCardsSchema = listSchema.extend({
 export type ListWithCards = z.infer<typeof listWithCardsSchema>;
 
 export const boardDetailSchema = boardSchema.extend({
+  labels: z.array(labelSchema),
   lists: z.array(listWithCardsSchema),
 });
 export type BoardDetail = z.infer<typeof boardDetailSchema>;

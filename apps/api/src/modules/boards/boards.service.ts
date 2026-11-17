@@ -3,6 +3,7 @@ import type { Board, BoardDetail } from '@kompak/shared';
 import { POSITION_STEP } from '../../common/ordering';
 import { WorkspaceRole } from '../../generated/prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
+import { toLabel } from '../labels/label-mappers';
 import { RealtimeService } from '../realtime/realtime.service';
 import { WorkspaceAccessService } from '../workspaces/workspace-access.service';
 import { toCard, toList } from './board-mappers';
@@ -60,18 +61,26 @@ export class BoardsService {
 
   async get(userId: string, boardId: string): Promise<BoardDetail> {
     const board = await this.access.requireBoard(userId, boardId);
-    const lists = await this.prisma.list.findMany({
-      where: { boardId: board.id, archivedAt: null },
-      orderBy: [{ position: 'asc' }, { id: 'asc' }],
-      include: {
-        cards: {
-          where: { archivedAt: null },
-          orderBy: [{ position: 'asc' }, { id: 'asc' }],
+    const [labels, lists] = await Promise.all([
+      this.prisma.label.findMany({
+        where: { boardId: board.id },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      }),
+      this.prisma.list.findMany({
+        where: { boardId: board.id, archivedAt: null },
+        orderBy: [{ position: 'asc' }, { id: 'asc' }],
+        include: {
+          cards: {
+            where: { archivedAt: null },
+            orderBy: [{ position: 'asc' }, { id: 'asc' }],
+            include: { labels: { select: { labelId: true } } },
+          },
         },
-      },
-    });
+      }),
+    ]);
     return {
       ...toBoard(board),
+      labels: labels.map(toLabel),
       lists: lists.map((list) => ({
         ...toList(list),
         cards: list.cards.map(toCard),
