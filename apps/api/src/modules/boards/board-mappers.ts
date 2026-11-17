@@ -30,6 +30,7 @@ export function toCard(card: {
   createdById: string;
   createdAt: Date;
   updatedAt: Date;
+  labels: { labelId: string }[];
 }): Card {
   return {
     id: card.id,
@@ -39,6 +40,8 @@ export function toCard(card: {
     description: card.description,
     assigneeId: card.assigneeId,
     dueDate: formatDate(card.dueDate),
+    // Terurut agar hasilnya deterministik.
+    labelIds: card.labels.map((item) => item.labelId).sort(),
     position: card.position,
     createdById: card.createdById,
     createdAt: card.createdAt.toISOString(),

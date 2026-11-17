@@ -35,6 +35,16 @@ export interface CardRecord {
   createdById: string;
   createdAt: Date;
   updatedAt: Date;
+  labels: { labelId: string }[];
+  role: WorkspaceRole;
+}
+
+export interface LabelRecord {
+  id: string;
+  boardId: string;
+  workspaceId: string;
+  name: string;
+  color: string;
   role: WorkspaceRole;
 }
 
@@ -126,7 +136,10 @@ export class WorkspaceAccessService {
           workspace: { members: { some: { userId } } },
         },
       },
-      include: { board: { select: { workspaceId: true } } },
+      include: {
+        board: { select: { workspaceId: true } },
+        labels: { select: { labelId: true } },
+      },
     });
     if (!card) {
       throw new NotFoundException('Card not found');
@@ -145,6 +158,36 @@ export class WorkspaceAccessService {
       createdById: card.createdById,
       createdAt: card.createdAt,
       updatedAt: card.updatedAt,
+      labels: card.labels,
+      role,
+    };
+  }
+
+  async requireLabel(
+    userId: string,
+    labelId: string,
+    allowed: readonly WorkspaceRole[] = [],
+  ): Promise<LabelRecord> {
+    const label = await this.prisma.label.findFirst({
+      where: {
+        id: labelId,
+        board: {
+          archivedAt: null,
+          workspace: { members: { some: { userId } } },
+        },
+      },
+      include: { board: { select: { workspaceId: true } } },
+    });
+    if (!label) {
+      throw new NotFoundException('Label not found');
+    }
+    const role = await this.requireRole(userId, label.board.workspaceId, allowed);
+    return {
+      id: label.id,
+      boardId: label.boardId,
+      workspaceId: label.board.workspaceId,
+      name: label.name,
+      color: label.color,
       role,
     };
   }

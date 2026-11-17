@@ -6,8 +6,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BoardsModule } from './modules/boards/boards.module';
 import { CardsModule } from './modules/cards/cards.module';
 import { CommentsModule } from './modules/comments/comments.module';
+import { LabelsModule } from './modules/labels/labels.module';
 import { ListsModule } from './modules/lists/lists.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
+import { SearchModule } from './modules/search/search.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -25,8 +27,10 @@ import { PrismaModule } from './prisma/prisma.module';
     BoardsModule,
     ListsModule,
     CardsModule,
+    LabelsModule,
     ActivityModule,
     CommentsModule,
+    SearchModule,
   ],
   controllers: [HealthController],
 })
