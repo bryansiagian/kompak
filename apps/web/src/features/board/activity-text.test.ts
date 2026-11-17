@@ -19,6 +19,9 @@ const samples: Activity[] = [
   { ...base, cardId: 'c1', type: 'card.assigned', payload: { title: 'Laporan', assigneeName: null } },
   { ...base, cardId: 'c1', type: 'card.due_changed', payload: { title: 'Laporan', dueDate: '2026-12-31' } },
   { ...base, cardId: 'c1', type: 'card.due_changed', payload: { title: 'Laporan', dueDate: null } },
+  { ...base, cardId: 'c1', type: 'card.labels_changed', payload: { title: 'Laporan', added: ['Penting', 'Desain'], removed: [] } },
+  { ...base, cardId: 'c1', type: 'card.labels_changed', payload: { title: 'Laporan', added: [], removed: ['Desain'] } },
+  { ...base, cardId: 'c1', type: 'card.labels_changed', payload: { title: 'Laporan', added: ['Penting'], removed: ['Desain'] } },
   { ...base, cardId: 'c1', type: 'card.moved', payload: { title: 'Laporan', fromListName: 'Belum dikerjakan', toListName: 'Selesai' } },
   { ...base, cardId: 'c1', type: 'card.deleted', payload: { title: 'Laporan' } },
   { ...base, cardId: 'c1', type: 'comment.added', payload: { title: 'Laporan', excerpt: 'Siap' } },
@@ -31,7 +34,7 @@ const items = messages.board.activity.items as Record<string, string>;
 
 describe('describeActivity', () => {
   it('semua jenis catatan terwakili', () => {
-    expect(new Set(samples.map((sample) => sample.type)).size).toBe(11);
+    expect(new Set(samples.map((sample) => sample.type)).size).toBe(12);
   });
 
   it('tiap catatan menghasilkan kunci yang ada di id.json dan semua isian pesannya terpenuhi', () => {
@@ -48,12 +51,27 @@ describe('describeActivity', () => {
     }
   });
 
-  it('penanggung jawab dan tenggat yang dikosongkan memakai kalimat tersendiri', () => {
+  it('penanggung jawab, tenggat, dan label memakai kalimat sesuai perubahannya', () => {
     const kinds = samples.map((sample) => describeActivity(sample).key);
-    expect(kinds).toContain('cardAssigned');
-    expect(kinds).toContain('cardUnassigned');
-    expect(kinds).toContain('cardDueChanged');
-    expect(kinds).toContain('cardDueCleared');
+    for (const key of [
+      'cardAssigned',
+      'cardUnassigned',
+      'cardDueChanged',
+      'cardDueCleared',
+      'cardLabelsAdded',
+      'cardLabelsRemoved',
+      'cardLabelsChanged',
+    ]) {
+      expect(kinds).toContain(key);
+    }
+  });
+
+  it('nama label digabung dengan koma', () => {
+    const added = samples.find(
+      (sample) =>
+        sample.type === 'card.labels_changed' && sample.payload.added.length === 2,
+    );
+    expect(added && describeActivity(added).values.added).toBe('Penting, Desain');
   });
 
   it('tenggat diformat sebagai tanggal Indonesia', () => {
