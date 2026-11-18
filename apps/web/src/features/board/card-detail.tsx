@@ -15,6 +15,7 @@ import { workspaceErrorKey } from '@/features/workspaces/errors';
 import { canDeleteCard } from '@/features/workspaces/permissions';
 import type { Placement } from './board-cache';
 import { CardCollaboration } from './card-collaboration';
+import { CardLabels } from './card-labels';
 import { CardMoveControls } from './card-move-controls';
 import { useDeleteCard, useUpdateCard } from './hooks';
 
@@ -159,6 +160,12 @@ export function CardDetail({
             {update.isPending ? t('saving') : t('save')}
           </Button>
         </form>
+
+        <CardLabels
+          key={`${card.id}:${card.labelIds.join(',')}`}
+          board={board}
+          card={card}
+        />
 
         <CardCollaboration cardId={card.id} viewer={viewer} />
 

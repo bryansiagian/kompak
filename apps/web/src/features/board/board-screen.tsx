@@ -21,6 +21,7 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import type { AuthUser, BoardDetail } from '@kompak/shared';
 import { FormAlert } from '@/components/ui/form-alert';
 import { LoadingScreen } from '@/components/ui/loading-screen';
@@ -31,6 +32,9 @@ import { canManage } from '@/features/workspaces/permissions';
 import { AccessLost } from './access-lost';
 import { AddListForm } from './add-list-form';
 import { BoardActivityButton } from './board-activity-panel';
+import { BoardFilterControls } from './board-filter-controls';
+import { EMPTY_FILTERS, filteredBoard, hasFilters } from './board-filters';
+import type { BoardFilters } from './board-filters';
 import {
   placementOf,
   samePlacement,
@@ -48,6 +52,8 @@ import {
 } from './dnd-helpers';
 import { boardKey, useBoard, useMoveCard, useMoveList } from './hooks';
 import { ListColumn } from './list-column';
+import { LabelManager } from './label-manager';
+import { todayIso } from './due-date';
 import { othersOf } from './presence';
 import { PresenceBar } from './presence-bar';
 import { useBoardRealtime } from './use-board-realtime';
@@ -105,6 +111,9 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
 
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const [dismissedLinkedCard, setDismissedLinkedCard] = useState(false);
+  const [filters, setFilters] = useState<BoardFilters>(EMPTY_FILTERS);
   // Keadaan papan sebelum drag, untuk rollback dan pembatalan.
   const snapshotRef = useRef<BoardDetail | null>(null);
 
@@ -123,9 +132,18 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
 
   const allCards = board.lists.flatMap((list) => list.cards);
   const activeCard = allCards.find((card) => card.id === activeCardId) ?? null;
-  const selectedCard = allCards.find((card) => card.id === selectedCardId) ?? null;
+  const linkedCardId = dismissedLinkedCard ? null : searchParams.get('card');
+  const effectiveSelectedCardId = selectedCardId ?? linkedCardId;
 
-  const sensors = useSensors(
+  const selectedCard =
+    allCards.find((card) => card.id === effectiveSelectedCardId) ?? null;  const filtersActive = hasFilters(filters);
+  const visibleBoard = useMemo(
+    () => filteredBoard(board, filters, todayIso()),
+    [board, filters],
+  );
+  const visibleCount = visibleBoard.lists.reduce((sum, list) => sum + list.cards.length, 0);
+
+    const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
@@ -244,6 +262,15 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
         <BoardActivityButton boardId={board.id} />
       </div>
 
+      {manager ? <LabelManager board={board} /> : null}
+      <BoardFilterControls
+        board={board}
+        members={members.data ?? []}
+        filters={filters}
+        onChange={setFilters}
+        count={visibleCount}
+        total={allCards.length}
+      />
       <ConnectionBanner status={realtime.status} />
 
       {moveFailed ? (
@@ -270,12 +297,14 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
         }}
       >
         <div className="-mx-4 mt-4 flex items-start gap-3 overflow-x-auto px-4 pb-6">
-          {board.lists.map((list, index) => (
+          {visibleBoard.lists.map((list, index) => (
             <ListColumn
               key={list.id}
               boardId={board.id}
               list={list}
               canManage={manager}
+              dragDisabled={filtersActive}
+              labels={board.labels}
               canMoveLeft={index > 0}
               canMoveRight={index < board.lists.length - 1}
               assigneeNameOf={assigneeNameOf}
@@ -291,6 +320,7 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
             <CardView
               card={activeCard}
               assigneeName={assigneeNameOf(activeCard.assigneeId)}
+              labels={board.labels}
               overlay
             />
           ) : null}
@@ -306,7 +336,10 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
           members={members.data ?? []}
           viewer={{ userId: user.id, role }}
           onMove={(placement) => handleMoveCard(selectedCard.id, placement)}
-          onClose={() => setSelectedCardId(null)}
+          onClose={() => {
+            setSelectedCardId(null);
+            setDismissedLinkedCard(true);
+          }}
         />
       ) : null}
     </main>

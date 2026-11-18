@@ -4,7 +4,8 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
-import type { Card } from '@kompak/shared';
+import type { Card, Label } from '@kompak/shared';
+import { LABEL_STYLE } from './label-style';
 import { dueState, formatDueDate, todayIso } from './due-date';
 import type { DueState } from './due-date';
 
@@ -16,6 +17,7 @@ const DUE_CLASSES: Record<DueState, string> = {
 
 interface CardViewProps {
   card: Card;
+  labels?: Label[];
   assigneeName?: string;
   onOpen?: () => void;
   handle?: ReactNode;
@@ -25,6 +27,7 @@ interface CardViewProps {
 // Tampilan tugas tanpa logika drag, dipakai juga untuk lapisan yang ikut bergerak.
 export function CardView({
   card,
+  labels = [],
   assigneeName,
   onOpen,
   handle,
@@ -51,6 +54,15 @@ export function CardView({
         className="min-h-11 min-w-0 flex-1 rounded-xl p-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
       >
         <span className="block break-words font-medium">{card.title}</span>
+        {card.labelIds.length > 0 ? (
+          <span className="mt-1.5 flex flex-wrap gap-1">
+            {labels.filter((label) => card.labelIds.includes(label.id)).map((label) => (
+              <span key={label.id} className={`rounded-full px-2 py-0.5 text-xs ${LABEL_STYLE[label.color]}`}>
+                {label.name}
+              </span>
+            ))}
+          </span>
+        ) : null}
         {due || assigneeName ? (
           <span className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
             {due ? (
@@ -90,11 +102,12 @@ function GripIcon() {
 
 interface SortableCardProps {
   card: Card;
+  labels?: Label[];
   assigneeName?: string;
   onOpen: () => void;
 }
 
-export function SortableCard({ card, assigneeName, onOpen }: SortableCardProps) {
+export function SortableCard({ card, labels, assigneeName, onOpen }: SortableCardProps) {
   const t = useTranslations('board.card');
   const {
     attributes,
@@ -114,6 +127,7 @@ export function SortableCard({ card, assigneeName, onOpen }: SortableCardProps) 
     >
       <CardView
         card={card}
+        labels={labels}
         assigneeName={assigneeName}
         onOpen={onOpen}
         // touch-none hanya di pegangan: menggulir halaman di HP tetap normal.
