@@ -346,5 +346,33 @@
         "listDeleted": "{actor} menghapus kolom {name}."
       }
     }
+  },
+  "labels": {
+    "manage": "Kelola label",
+    "edit": "Ubah",
+    "delete": "Hapus",
+    "deleteConfirm": "Hapus label \"{name}\"?",
+    "name": "Nama label",
+    "color": "Warna label",
+    "error": "Gagal menyimpan perubahan label. Silakan coba lagi.",
+    "save": "Simpan perubahan",
+    "create": "Tambah label",
+    "cancel": "Batal",
+    "taskLabels": "Label tugas",
+    "selected": "{count} dari maksimal {max} label dipilih",
+    "apply": "Terapkan label"
+  },
+  "filters": {
+    "title": "Filter tugas",
+    "assignee": "Penanggung jawab",
+    "label": "Label",
+    "due": "Tenggat waktu",
+    "all": "Semua",
+    "overdue": "Terlambat",
+    "today": "Hari ini",
+    "week": "Minggu ini",
+    "showing": "Menampilkan {count} dari {total} tugas",
+    "clear": "Hapus filter"
   }
+
 }
