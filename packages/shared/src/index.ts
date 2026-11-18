@@ -13,4 +13,5 @@ export * from './kanban';
 export * from './comment';
 export * from './activity';
 export * from './search';
+export * from './ai';
 export * from './realtime';

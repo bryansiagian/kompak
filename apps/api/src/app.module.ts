@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { HealthController } from './health.controller';
 import { ActivityModule } from './modules/activity/activity.module';
+import { AiModule } from './modules/ai/ai.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BoardsModule } from './modules/boards/boards.module';
 import { CardsModule } from './modules/cards/cards.module';
@@ -29,6 +30,7 @@ import { PrismaModule } from './prisma/prisma.module';
     CardsModule,
     LabelsModule,
     ActivityModule,
+    AiModule,
     CommentsModule,
     SearchModule,
   ],

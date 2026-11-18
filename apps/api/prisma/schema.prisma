@@ -32,6 +32,7 @@ model User {
   createdCards    Card[]            @relation("CardCreator")
   comments        Comment[]         @relation("CommentAuthor")
   activities      Activity[]        @relation("ActivityActor")
+  aiUsages        AiUsage[]
 }
 
 model RefreshToken {
@@ -181,4 +182,13 @@ model Activity {
 
   @@index([boardId, createdAt])
   @@index([cardId, createdAt])
+}
+
+model AiUsage {
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  day      DateTime @db.Date
+  requests Int      @default(0)
+
+  @@id([userId, day])
 }
