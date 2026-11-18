@@ -16,6 +16,14 @@
     "decisions": "Keputusan",
     "actionItems": "Tindak lanjut"
   },
+  "search": {
+    "title": "Cari tugas dalam kelompok",
+    "placeholder": "Cari berdasarkan judul atau deskripsi tugas...",
+    "hint": "Ketik minimal 2 karakter untuk mencari tugas.",
+    "loading": "Mencari tugas...",
+    "error": "Pencarian gagal. Silakan coba lagi.",
+    "empty": "Tidak ada tugas yang cocok dengan pencarian."
+  },
   "meta": {
     "title": "Kompak",
     "description": "Tugas kelompok jadi lebih kompak. Bagi tugas, pantau progres, semua dari HP."
