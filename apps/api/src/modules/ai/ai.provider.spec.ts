@@ -35,7 +35,9 @@ describe('AiProvider', () => {
     }) as typeof fetch;
     const result = await new AiProvider().json('Return JSON', { title: 'Tugas' });
     expect(result).toEqual({ subtasks: [{ title: 'Buat kerangka', description: 'Awal' }] });
-    expect(String(sent?.body)).toContain('fake-model');
+    expect(JSON.parse(sent!.body as string)).toMatchObject({
+      model: 'fake-model',
+    });
     expect(sent?.headers).toMatchObject({ Authorization: 'Bearer test-only' });
   });
 
