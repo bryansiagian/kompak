@@ -20,7 +20,8 @@ import type {
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import type { AuthUser, BoardDetail } from '@kompak/shared';
 import { FormAlert } from '@/components/ui/form-alert';
 import { LoadingScreen } from '@/components/ui/loading-screen';
@@ -110,8 +111,9 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
 
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const [dismissedLinkedCard, setDismissedLinkedCard] = useState(false);
   const [filters, setFilters] = useState<BoardFilters>(EMPTY_FILTERS);
-  const openedFromLink = useRef(false);
   // Keadaan papan sebelum drag, untuk rollback dan pembatalan.
   const snapshotRef = useRef<BoardDetail | null>(null);
 
@@ -130,27 +132,18 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
 
   const allCards = board.lists.flatMap((list) => list.cards);
   const activeCard = allCards.find((card) => card.id === activeCardId) ?? null;
-  const selectedCard = allCards.find((card) => card.id === selectedCardId) ?? null;
-  const filtersActive = hasFilters(filters);
+  const linkedCardId = dismissedLinkedCard ? null : searchParams.get('card');
+  const effectiveSelectedCardId = selectedCardId ?? linkedCardId;
+
+  const selectedCard =
+    allCards.find((card) => card.id === effectiveSelectedCardId) ?? null;  const filtersActive = hasFilters(filters);
   const visibleBoard = useMemo(
     () => filteredBoard(board, filters, todayIso()),
     [board, filters],
   );
   const visibleCount = visibleBoard.lists.reduce((sum, list) => sum + list.cards.length, 0);
 
-  // Pencarian kelompok mengarah ke /projects/:id?card=:cardId.
-  // Hanya buka satu kali; tidak membuka kembali saat dialog ditutup.
-  useEffect(() => {
-    if (openedFromLink.current || typeof window === 'undefined') return;
-    const cardId = new URLSearchParams(window.location.search).get('card');
-    if (!cardId) return;
-    if (allCards.some((card) => card.id === cardId)) {
-      openedFromLink.current = true;
-      setSelectedCardId(cardId);
-    }
-  }, [allCards]);
-
-  const sensors = useSensors(
+    const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
@@ -343,7 +336,10 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
           members={members.data ?? []}
           viewer={{ userId: user.id, role }}
           onMove={(placement) => handleMoveCard(selectedCard.id, placement)}
-          onClose={() => setSelectedCardId(null)}
+          onClose={() => {
+            setSelectedCardId(null);
+            setDismissedLinkedCard(true);
+          }}
         />
       ) : null}
     </main>

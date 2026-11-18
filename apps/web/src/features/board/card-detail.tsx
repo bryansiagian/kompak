@@ -161,7 +161,11 @@ export function CardDetail({
           </Button>
         </form>
 
-        <CardLabels board={board} card={card} />
+        <CardLabels
+          key={`${card.id}:${card.labelIds.join(',')}`}
+          board={board}
+          card={card}
+        />
 
         <CardCollaboration cardId={card.id} viewer={viewer} />
 
