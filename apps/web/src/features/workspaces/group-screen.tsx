@@ -11,6 +11,7 @@ import { InviteSection } from './invite-section';
 import { MembersSection } from './members-section';
 import { ProjectsSection } from './projects-section';
 import { RoleBadge } from './role-badge';
+import { WorkspaceSearch } from './workspace-search';
 
 export function GroupScreen({ groupId }: { groupId: string }) {
   return (
@@ -51,6 +52,7 @@ function GroupContent({ groupId, user }: { groupId: string; user: AuthUser }) {
       </header>
 
       <ProjectsSection groupId={data.id} role={data.role} />
+      <WorkspaceSearch workspaceId={data.id} />
       <InviteSection workspace={data} />
       <MembersSection
         groupId={data.id}
