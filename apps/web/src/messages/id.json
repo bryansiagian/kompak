@@ -1,4 +1,21 @@
 {
+  "ai": {
+    "title": "Bantuan AI",
+    "disclaimer": "Hasil AI hanya saran. Periksa terlebih dahulu sebelum menambahkan tugas. Isi tugas dan komentar akan dikirim ke penyedia AI yang digunakan aplikasi.",
+    "generate": "Buat saran subtugas",
+    "summarize": "Ringkas diskusi",
+    "loading": "Sedang memproses…",
+    "requestFailed": "AI belum dapat memproses permintaan ini. Periksa konfigurasi atau coba lagi nanti.",
+    "suggestions": "Usulan subtugas",
+    "accept": "Tambahkan subtugas terpilih",
+    "created": "Berhasil ditambahkan",
+    "saving": "Sedang menambahkan…",
+    "saveFailed": "Sebagian tugas gagal disimpan. Periksa daftar tugas sebelum mencoba lagi.",
+    "summaryTitle": "Ringkasan diskusi",
+    "keyPoints": "Poin penting",
+    "decisions": "Keputusan",
+    "actionItems": "Tindak lanjut"
+  },
   "meta": {
     "title": "Kompak",
     "description": "Tugas kelompok jadi lebih kompak. Bagi tugas, pantau progres, semua dari HP."
