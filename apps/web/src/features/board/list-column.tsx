@@ -6,8 +6,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useTranslations } from 'next-intl';
-import type { ListWithCards } from '@kompak/shared';
-import { SortableCard } from './card-item';
+import type { ListWithCards, Label } from '@kompak/shared';
+import { CardView, SortableCard } from './card-item';
 import { listDroppableId } from './dnd-helpers';
 import { ListHeader } from './list-header';
 import { QuickAddCard } from './quick-add-card';
@@ -16,6 +16,8 @@ interface ListColumnProps {
   boardId: string;
   list: ListWithCards;
   canManage: boolean;
+  dragDisabled: boolean;
+  labels: Label[];
   canMoveLeft: boolean;
   canMoveRight: boolean;
   assigneeNameOf: (assigneeId: string | null) => string | undefined;
@@ -27,6 +29,8 @@ export function ListColumn({
   boardId,
   list,
   canManage,
+  dragDisabled,
+  labels,
   canMoveLeft,
   canMoveRight,
   assigneeNameOf,
@@ -63,14 +67,25 @@ export function ListColumn({
           items={list.cards.map((card) => card.id)}
           strategy={verticalListSortingStrategy}
         >
-          {list.cards.map((card) => (
-            <SortableCard
-              key={card.id}
-              card={card}
-              assigneeName={assigneeNameOf(card.assigneeId)}
-              onOpen={() => onOpenCard(card.id)}
-            />
-          ))}
+          {list.cards.map((card) =>
+            dragDisabled ? (
+              <CardView
+                key={card.id}
+                card={card}
+                labels={labels}
+                assigneeName={assigneeNameOf(card.assigneeId)}
+                onOpen={() => onOpenCard(card.id)}
+              />
+            ) : (
+              <SortableCard
+                key={card.id}
+                card={card}
+                labels={labels}
+                assigneeName={assigneeNameOf(card.assigneeId)}
+                onOpen={() => onOpenCard(card.id)}
+              />
+            ),
+          )}
         </SortableContext>
         {list.cards.length === 0 ? (
           <p className="px-1 py-2 text-sm text-stone-500">{t('emptyList')}</p>
