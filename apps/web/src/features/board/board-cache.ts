@@ -194,8 +194,25 @@ export function removeCardFromBoard(
   };
 }
 
-export function addListToBoard(board: BoardDetail, list: List): BoardDetail {
-  return { ...board, lists: [...board.lists, { ...list, cards: [] }] };
+
+export function addListToBoard(
+  board: BoardDetail,
+  list: List,
+): BoardDetail {
+  // Cegah kolom yang sama ditambahkan dua kali oleh
+  // respons REST API dan event real-time Socket.IO.
+  const listExists = board.lists.some(
+    (item) => item.id === list.id,
+  );
+
+  if (listExists) {
+    return board;
+  }
+
+  return {
+    ...board,
+    lists: [...board.lists, { ...list, cards: [] }],
+  };
 }
 
 export function replaceListInBoard(board: BoardDetail, list: List): BoardDetail {
