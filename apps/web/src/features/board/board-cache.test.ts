@@ -246,4 +246,33 @@ describe('perubahan tugas dan kolom di cache', () => {
     // Tidak membuat state baru jika tidak ada perubahan.
     expect(afterMutation).toBe(afterRealtime);
   });
+
+  it('tidak menggandakan kolom ketika REST dan realtime mengirim ID yang sama', () => {
+    const board = makeBoard();
+
+    const newList = {
+      id: 'review',
+      boardId: 'b1',
+      name: 'Review',
+      position: 4096,
+    };
+
+    // Simulasi event Socket.IO diterima lebih dahulu.
+    const afterRealtime = addListToBoard(board, newList);
+
+    // Simulasi respons REST API untuk kolom yang sama.
+    const afterMutation = addListToBoard(
+      afterRealtime,
+      newList,
+    );
+
+    expect(
+      afterMutation.lists.filter(
+        (list) => list.id === 'review',
+      ),
+    ).toHaveLength(1);
+
+    // Tidak terjadi perubahan state yang tidak diperlukan.
+    expect(afterMutation).toBe(afterRealtime);
+  });
 });
