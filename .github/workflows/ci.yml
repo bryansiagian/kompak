@@ -12,7 +12,6 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-
     services:
       db:
         image: postgres:16
@@ -27,32 +26,38 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
-
     env:
       DATABASE_URL: postgresql://kompak:kompak@localhost:5432/kompak
       JWT_ACCESS_SECRET: ci-access-secret-not-for-production
       JWT_REFRESH_SECRET: ci-refresh-secret-not-for-production
       EMAIL_CODE_SECRET: ci-email-code-secret-not-for-production
       CORS_ORIGIN: http://localhost:3000
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
-
       - run: pnpm install --frozen-lockfile
-
       - run: pnpm generate
-
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - run: node --test scripts/check-production-env.test.mjs
       - run: pnpm build
-
       - run: pnpm --filter api migrate:deploy
       - run: pnpm test:e2e
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build production API image
+        run: docker build -f apps/api/Dockerfile -t kompak-api:ci .
+      - name: Build production web image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=https://kompak.example.com \
+            --build-arg NEXT_PUBLIC_WS_URL=https://kompak.example.com \
+            -f apps/web/Dockerfile -t kompak-web:ci .
