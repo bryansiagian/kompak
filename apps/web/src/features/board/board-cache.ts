@@ -138,11 +138,35 @@ export function moveListInBoard(
   return { ...board, lists };
 }
 
-export function addCardToBoard(board: BoardDetail, card: Card): BoardDetail {
+
+export function addCardToBoard(
+  board: BoardDetail,
+  card: Card,
+): BoardDetail {
+  // Cegah duplikasi ketika respons REST dan event Socket.IO
+  // sama-sama mencoba menambahkan kartu yang sama.
+  const cardExists = board.lists.some((list) =>
+    list.cards.some((item) => item.id === card.id),
+  );
+
+  if (cardExists) {
+    return board;
+  }
+
+  const targetListExists = board.lists.some(
+    (list) => list.id === card.listId,
+  );
+
+  if (!targetListExists) {
+    return board;
+  }
+
   return {
     ...board,
     lists: board.lists.map((list) =>
-      list.id === card.listId ? { ...list, cards: [...list.cards, card] } : list,
+      list.id === card.listId
+        ? { ...list, cards: [...list.cards, card] }
+        : list,
     ),
   };
 }

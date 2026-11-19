@@ -224,4 +224,26 @@ describe('perubahan tugas dan kolom di cache', () => {
       'review',
     ]);
   });
+
+  it('tidak menggandakan kartu ketika event dan mutation diterima dua kali', () => {
+    const board = makeBoard();
+    const newCard = makeCard('e', 'todo');
+
+    // Simulasi event Socket.IO
+    const afterRealtime = addCardToBoard(board, newCard);
+
+    // Simulasi respons REST API untuk kartu yang sama
+    const afterMutation = addCardToBoard(afterRealtime, newCard);
+
+    const cards = afterMutation.lists.flatMap(
+      (list) => list.cards,
+    );
+
+    expect(
+      cards.filter((card) => card.id === 'e'),
+    ).toHaveLength(1);
+
+    // Tidak membuat state baru jika tidak ada perubahan.
+    expect(afterMutation).toBe(afterRealtime);
+  });
 });
