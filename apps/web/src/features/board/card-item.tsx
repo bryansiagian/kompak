@@ -43,8 +43,8 @@ export function CardView({
 
   return (
     <div
-      className={`flex items-stretch rounded-xl border border-divider bg-surface shadow-panel ${
-        overlay ? 'shadow-lg' : 'shadow-sm'
+      className={`task-slip flex items-stretch rounded-lg border border-divider bg-surface ${
+        overlay ? 'drag-preview' : 'shadow-panel'
       }`}
     >
       {handle}

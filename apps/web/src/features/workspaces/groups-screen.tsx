@@ -63,24 +63,23 @@ export function GroupsScreen() {
               ) : workspaces.data.length === 0 ? (
                 <EmptyState>{t('list.empty')}</EmptyState>
               ) : (
-                <ul className="grid gap-3 sm:grid-cols-2">
+                <ul className="divide-y divide-divider border-y border-divider">
                   {workspaces.data.map((workspace) => (
                     <li key={workspace.id} className="min-w-0">
                       <Link
                         href={`/groups/${workspace.id}`}
-                        className="control-focus flex h-full min-h-36 flex-col justify-between gap-4 rounded-2xl border border-divider bg-surface p-4 shadow-panel transition-colors hover:border-primary sm:p-5"
+                        className="control-focus directory-row grid min-h-20 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-1 py-3 sm:gap-5 sm:px-3"
                       >
-                        <span className="flex items-start justify-between gap-2">
+                        <>
                           <span
                             aria-hidden="true"
-                            className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-tint font-bold text-brand-ink"
+                            className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-tint font-serif text-xl italic text-brand-ink"
                           >
                             {Array.from(
                               workspace.name.trim(),
                             )[0]?.toLocaleUpperCase('id')}
                           </span>
-                          <RoleBadge role={workspace.role} />
-                        </span>
+                        </>
                         <span>
                           <span className="block wrap-anywhere text-lg font-bold">
                             {workspace.name}
@@ -89,12 +88,13 @@ export function GroupsScreen() {
                             {t('list.memberCount', {
                               count: workspace.memberCount,
                             })}
-                            {' ? '}
+                            {' / '}
                             {t('list.boardCount', {
                               count: workspace.boardCount,
                             })}
                           </span>
                         </span>
+                        <RoleBadge role={workspace.role} />
                       </Link>
                     </li>
                   ))}

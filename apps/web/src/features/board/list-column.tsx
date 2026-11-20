@@ -49,7 +49,7 @@ export function ListColumn({
       id={`lane-${list.id}`}
       tabIndex={-1}
       aria-label={list.name}
-      className="control-focus w-[calc(100vw-4.5rem)] max-w-80 shrink-0 rounded-xl border border-divider bg-board-lane p-3 sm:w-76"
+      className="control-focus w-[calc(100vw-4.5rem)] max-w-80 shrink-0 rounded-lg border-t-2 border-brand-ink bg-board-lane p-3 sm:w-76"
     >
       <ListHeader
         boardId={boardId}

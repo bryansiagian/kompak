@@ -8,13 +8,11 @@ export function Brand({ linked = false }: { linked?: boolean }) {
     <>
       <span
         aria-hidden="true"
-        className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-lg font-black text-white"
+        className="brand-stamp grid size-9 shrink-0 place-items-center"
       >
         K
       </span>
-      <span className="text-xl font-extrabold tracking-tight">
-        {t('appName')}
-      </span>
+      <span className="wordmark">{t('appName')}</span>
     </>
   );
   return linked ? (
@@ -47,7 +45,7 @@ export function AppShell({
       >
         {t('skip')}
       </a>
-      <header className="border-b border-divider bg-surface">
+      <header className="masthead">
         <div
           className={`mx-auto flex min-h-16 items-center justify-between gap-3 px-4 py-2 sm:px-6 ${wide ? 'max-w-[100rem]' : 'max-w-7xl'}`}
         >
@@ -55,7 +53,7 @@ export function AppShell({
             <Brand linked />
             <Link
               href="/"
-              className="control-focus hidden min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-muted-foreground hover:text-primary sm:inline-flex"
+              className="control-focus hidden min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-emerald-100 hover:bg-white/10 hover:text-white sm:inline-flex"
             >
               {t('groups')}
             </Link>
@@ -84,11 +82,9 @@ export function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4 border-b border-divider pb-5 sm:flex-row sm:items-end sm:justify-between">
+    <div className="page-heading flex flex-col gap-4 pb-5 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h1 className="wrap-anywhere text-3xl font-extrabold tracking-tight sm:text-4xl">
-          {title}
-        </h1>
+        <h1 className="display-heading wrap-anywhere">{title}</h1>
         {description ? (
           <p className="mt-2 wrap-anywhere text-pretty text-muted-foreground">
             {description}

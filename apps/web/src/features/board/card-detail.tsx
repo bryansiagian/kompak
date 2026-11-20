@@ -116,10 +116,12 @@ export function CardDetail({
       aria-labelledby={headingId}
       className="fixed inset-x-0 bottom-0 m-0 max-h-[92dvh] w-full max-w-none overflow-y-auto overscroll-contain scroll-pt-20 rounded-t-3xl bg-surface p-0 text-foreground shadow-xl backdrop:bg-brand-ink/55 sm:inset-0 sm:m-auto sm:h-fit sm:w-[calc(100%-2rem)] sm:max-w-5xl sm:rounded-3xl"
     >
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-divider bg-surface px-4 py-3 sm:px-6">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-divider bg-brand-ink px-4 py-3 text-white sm:px-6">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-primary">{t('title')}</p>
-          <h2 id={headingId} className="truncate text-xl font-extrabold">
+          <p className="text-xs font-semibold tracking-wide text-emerald-100">
+            {t('title')}
+          </p>
+          <h2 id={headingId} className="truncate font-serif text-2xl">
             {card.title}
           </h2>
         </div>
@@ -151,7 +153,7 @@ export function CardDetail({
           <form
             onSubmit={handleSubmit}
             noValidate
-            className="space-y-4 rounded-2xl border border-divider p-4"
+            className="space-y-4 border-t border-divider pt-4"
           >
             <h3 className="font-bold">{design('taskDetails')}</h3>
             <TextField
@@ -218,7 +220,7 @@ export function CardDetail({
           ) : null}
         </div>
         <div className="min-w-0 space-y-4">
-          <section className="space-y-4 rounded-2xl border border-divider bg-surface-muted/50 p-4">
+          <section className="space-y-4 border-l-2 border-primary bg-canvas p-4">
             <h3 className="font-bold">{design('discussion')}</h3>
             <CardCollaboration cardId={card.id} viewer={viewer} />
           </section>

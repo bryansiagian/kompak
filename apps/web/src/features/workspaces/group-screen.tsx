@@ -69,14 +69,17 @@ function GroupContent({ groupId, user }: { groupId: string; user: AuthUser }) {
           {design('inviteAction')}
         </a>
       </PageHeader>
-      <div className="mt-6 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="workspace-spread mt-6 grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(15rem,.65fr)] xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-w-0 space-y-5">
           <ProjectsSection groupId={data.id} role={data.role} />
           <Section title={design('taskSearch')}>
             <WorkspaceSearch workspaceId={data.id} />
           </Section>
         </div>
-        <aside className="min-w-0 space-y-5" aria-label={design('groups')}>
+        <aside
+          className="min-w-0 space-y-5 md:border-l md:border-divider md:pl-5"
+          aria-label={design('groups')}
+        >
           <InviteSection workspace={data} />
           <MembersSection
             groupId={data.id}

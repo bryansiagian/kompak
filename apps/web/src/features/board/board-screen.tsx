@@ -289,7 +289,7 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
         <BoardActivityButton boardId={board.id} />
       </PageHeader>
 
-      <div className="mt-4 grid gap-3 rounded-2xl border border-divider bg-surface p-3 shadow-panel sm:p-4 lg:grid-cols-2">
+      <div className="mt-4 grid items-start gap-3 border-y border-divider py-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,.8fr)_minmax(15rem,.7fr)]">
         <TextField
           type="search"
           label={design('boardSearch')}
@@ -329,7 +329,7 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
             </Button>
           </div>
         ) : null}
-        <details className="rounded-xl bg-surface-muted lg:col-span-2">
+        <details className="rounded-lg bg-brand-tint sm:col-span-2 xl:col-span-1 xl:mt-6">
           <summary className="control-focus min-h-11 cursor-pointer rounded-xl px-3 py-3 text-sm font-semibold">
             {design('boardTools')}
           </summary>
@@ -385,7 +385,7 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
           role="region"
           aria-label={design('boardLayout')}
           tabIndex={0}
-          className="control-focus mt-5 flex min-w-0 items-start gap-3 overflow-x-auto rounded-2xl border border-divider bg-surface-muted/60 p-3 pb-5 sm:gap-4 sm:p-4"
+          className="control-focus mt-5 flex min-w-0 items-start gap-3 overflow-x-auto pb-5 pt-1 sm:gap-4"
         >
           {visibleBoard.lists.map((list, index) => (
             <ListColumn
