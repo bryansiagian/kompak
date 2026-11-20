@@ -103,7 +103,7 @@ function BoardContent({ boardId, user }: { boardId: string; user: AuthUser }) {
               <RetryButton {...loadError.retry} />
             </div>
           ) : null}
-          <TextLink href="/">{t('backHome')}</TextLink>
+          <TextLink href="/groups">{t('backHome')}</TextLink>
         </div>
       </AppShell>
     );
@@ -289,7 +289,7 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
         <BoardActivityButton boardId={board.id} />
       </PageHeader>
 
-      <div className="mt-4 grid items-start gap-3 border-y border-divider py-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,.8fr)_minmax(15rem,.7fr)]">
+      <div className="mt-2 grid items-start gap-3 rounded-xl border border-divider bg-surface p-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,6fr)_minmax(12rem,3fr)_minmax(12rem,3fr)]">
         <TextField
           type="search"
           label={design('boardSearch')}
@@ -329,7 +329,7 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
             </Button>
           </div>
         ) : null}
-        <details className="rounded-lg bg-brand-tint sm:col-span-2 xl:col-span-1 xl:mt-6">
+        <details className="rounded-lg bg-brand-tint sm:col-span-2 lg:col-span-1 lg:mt-6">
           <summary className="control-focus min-h-11 cursor-pointer rounded-xl px-3 py-3 text-sm font-semibold">
             {design('boardTools')}
           </summary>

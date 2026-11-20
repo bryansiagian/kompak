@@ -137,7 +137,7 @@ export function CardAiAssistant({ card }: Props) {
                     <strong className="block">{item.title}</strong>
                     <span className="text-stone-600">{item.description}</span>
                     {createdIndexes.includes(index) ? (
-                      <span className="block text-emerald-700">
+                      <span className="block text-primary">
                         {t('created')}
                       </span>
                     ) : null}

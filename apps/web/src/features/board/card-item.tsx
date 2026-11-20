@@ -51,7 +51,7 @@ export function CardView({
       <button
         type="button"
         onClick={onOpen}
-        className="min-h-11 min-w-0 flex-1 rounded-xl p-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        className="min-h-11 min-w-0 flex-1 rounded-xl p-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
         <span className="block wrap-anywhere font-semibold">{card.title}</span>
         {card.labelIds.length > 0 ? (
@@ -146,7 +146,7 @@ export function SortableCard({
             type="button"
             ref={setActivatorNodeRef}
             aria-label={t('drag', { title: card.title })}
-            className="flex min-h-11 w-11 shrink-0 touch-none items-center justify-center rounded-l-xl text-muted-foreground hover:bg-brand-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+            className="flex min-h-11 w-11 shrink-0 touch-none items-center justify-center rounded-l-xl text-muted-foreground hover:bg-brand-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             {...attributes}
             {...listeners}
           >

@@ -116,12 +116,15 @@ export function CardDetail({
       aria-labelledby={headingId}
       className="fixed inset-x-0 bottom-0 m-0 max-h-[92dvh] w-full max-w-none overflow-y-auto overscroll-contain scroll-pt-20 rounded-t-3xl bg-surface p-0 text-foreground shadow-xl backdrop:bg-brand-ink/55 sm:inset-0 sm:m-auto sm:h-fit sm:w-[calc(100%-2rem)] sm:max-w-5xl sm:rounded-3xl"
     >
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-divider bg-brand-ink px-4 py-3 text-white sm:px-6">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-divider bg-surface px-4 py-3 text-foreground sm:px-6">
         <div className="min-w-0">
-          <p className="text-xs font-semibold tracking-wide text-emerald-100">
+          <p className="text-xs font-semibold tracking-wide text-primary">
             {t('title')}
           </p>
-          <h2 id={headingId} className="truncate font-serif text-2xl">
+          <h2
+            id={headingId}
+            className="wrap-anywhere text-xl font-bold leading-tight sm:text-2xl"
+          >
             {card.title}
           </h2>
         </div>
@@ -130,7 +133,7 @@ export function CardDetail({
         </Button>
       </header>
 
-      <div className="grid items-start gap-4 p-4 sm:p-6 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+      <div className="grid items-start gap-4 p-4 sm:p-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <div className="min-w-0 space-y-4">
           <div className="rounded-2xl border border-divider bg-brand-tint p-4">
             <CardMoveControls
@@ -220,7 +223,7 @@ export function CardDetail({
           ) : null}
         </div>
         <div className="min-w-0 space-y-4">
-          <section className="space-y-4 border-l-2 border-primary bg-canvas p-4">
+          <section className="space-y-4 rounded-xl bg-board-lane p-4">
             <h3 className="font-bold">{design('discussion')}</h3>
             <CardCollaboration cardId={card.id} viewer={viewer} />
           </section>
