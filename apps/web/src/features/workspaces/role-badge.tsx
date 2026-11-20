@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import type { WorkspaceRole } from '@kompak/shared';
 
 const STYLES: Record<WorkspaceRole, string> = {
-  OWNER: 'bg-emerald-100 text-emerald-800',
+  OWNER: 'bg-brand-tint text-brand-ink',
   ADMIN: 'bg-amber-100 text-amber-800',
   MEMBER: 'bg-stone-100 text-stone-700',
 };

@@ -50,7 +50,7 @@ export function JoinScreen({ code }: { code: string }) {
             <RetryButton {...loadError.retry} fullWidth />
           ) : null}
           <LinkButton
-            href="/"
+            href="/groups"
             variant={loadError.retry ? 'secondary' : 'primary'}
             fullWidth
           >

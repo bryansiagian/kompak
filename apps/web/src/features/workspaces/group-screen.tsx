@@ -2,8 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { AuthUser } from '@kompak/shared';
-import { AppShell, PageHeader } from '@/components/ui/app-shell';
-import { Section } from '@/components/ui/section';
+import { AppShell } from '@/components/ui/app-shell';
 import { RetryButton, useLoadError } from '@/components/ui/load-error';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { TextLink } from '@/components/ui/text-link';
@@ -49,7 +48,7 @@ function GroupContent({ groupId, user }: { groupId: string; user: AuthUser }) {
               <RetryButton {...loadError.retry} />
             </div>
           ) : null}
-          <TextLink href="/">{t('back')}</TextLink>
+          <TextLink href="/groups">{t('back')}</TextLink>
         </div>
       </AppShell>
     );
@@ -59,33 +58,33 @@ function GroupContent({ groupId, user }: { groupId: string; user: AuthUser }) {
 
   return (
     <AppShell>
-      <TextLink href="/">{t('back')}</TextLink>
-      <PageHeader title={data.name} description={design('groupDescription')}>
+      <TextLink href="/groups">{t('back')}</TextLink>
+      <header className="my-4 flex flex-wrap items-center gap-3 border-b border-divider pb-5">
+        <h1 className="min-w-0 wrap-anywhere text-3xl font-bold tracking-tight sm:text-5xl">
+          {data.name}
+        </h1>
         <RoleBadge role={data.role} />
         <a
-          href="#group-invite"
+          href="#workspace-invitation"
           className="control-focus inline-flex min-h-11 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover"
         >
           {design('inviteAction')}
         </a>
-      </PageHeader>
-      <div className="workspace-spread mt-6 grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(15rem,.65fr)] xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="min-w-0 space-y-5">
+      </header>
+      <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-10">
+        <div className="min-w-0 space-y-6">
           <ProjectsSection groupId={data.id} role={data.role} />
-          <Section title={design('taskSearch')}>
+          <div className="border-t border-divider pt-5">
             <WorkspaceSearch workspaceId={data.id} />
-          </Section>
+          </div>
         </div>
-        <aside
-          className="min-w-0 space-y-5 md:border-l md:border-divider md:pl-5"
-          aria-label={design('groups')}
-        >
+        <aside className="min-w-0 space-y-5">
           <InviteSection workspace={data} />
           <MembersSection
             groupId={data.id}
             viewer={{ userId: user.id, role: data.role }}
           />
-          <details className="rounded-2xl border border-divider bg-surface">
+          <details className="border-t border-divider">
             <summary className="control-focus min-h-11 cursor-pointer rounded-2xl px-4 py-3 font-semibold">
               {design('settings')}
             </summary>

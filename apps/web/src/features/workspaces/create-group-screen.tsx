@@ -40,7 +40,7 @@ export function CreateGroupScreen() {
     <RequireAuth>
       {() => (
         <AppShell>
-          <TextLink href="/">{t('create.back')}</TextLink>
+          <TextLink href="/groups">{t('create.back')}</TextLink>
           <div className="mx-auto max-w-lg">
             <PageHeader
               title={t('create.title')}

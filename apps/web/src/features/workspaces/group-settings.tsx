@@ -9,7 +9,6 @@ import type { WorkspaceDetail } from '@kompak/shared';
 import { Button } from '@/components/ui/button';
 import { ConfirmAction } from '@/components/ui/confirm-action';
 import { FormAlert } from '@/components/ui/form-alert';
-import { Section } from '@/components/ui/section';
 import { TextField } from '@/components/ui/text-field';
 import { workspaceErrorKey } from './errors';
 import {
@@ -24,7 +23,10 @@ interface GroupSettingsProps {
   currentUserId: string;
 }
 
-export function GroupSettings({ workspace, currentUserId }: GroupSettingsProps) {
+export function GroupSettings({
+  workspace,
+  currentUserId,
+}: GroupSettingsProps) {
   const t = useTranslations('groups');
   const router = useRouter();
   const rename = useRenameWorkspace();
@@ -55,7 +57,7 @@ export function GroupSettings({ workspace, currentUserId }: GroupSettingsProps) 
         : null;
 
   return (
-    <Section title={t('settings.title')}>
+    <>
       <div className="space-y-4">
         {canManage(workspace.role) ? (
           <form
@@ -85,7 +87,7 @@ export function GroupSettings({ workspace, currentUserId }: GroupSettingsProps) 
             disabled={remove.isPending}
             onConfirm={() =>
               remove.mutate(workspace.id, {
-                onSuccess: () => router.replace('/'),
+                onSuccess: () => router.replace('/groups'),
               })
             }
           />
@@ -98,7 +100,7 @@ export function GroupSettings({ workspace, currentUserId }: GroupSettingsProps) 
             onConfirm={() =>
               leave.mutate(
                 { workspaceId: workspace.id, userId: currentUserId },
-                { onSuccess: () => router.replace('/') },
+                { onSuccess: () => router.replace('/groups') },
               )
             }
           />
@@ -108,6 +110,6 @@ export function GroupSettings({ workspace, currentUserId }: GroupSettingsProps) 
           <FormAlert>{t(`errors.${workspaceErrorKey(error)}`)}</FormAlert>
         ) : null}
       </div>
-    </Section>
+    </>
   );
 }

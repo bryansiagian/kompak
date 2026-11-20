@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ConfirmAction } from '@/components/ui/confirm-action';
 import { FormAlert } from '@/components/ui/form-alert';
 import { CollectionSkeleton } from '@/components/ui/collection-state';
-import { Section } from '@/components/ui/section';
+import { useState } from 'react';
 import { workspaceErrorKey } from './errors';
 import { useChangeMemberRole, useMembers, useRemoveMember } from './hooks';
 import { canChangeRoles, canRemoveMember } from './permissions';
@@ -26,35 +26,59 @@ export function MembersSection({ groupId, viewer }: MembersSectionProps) {
   const t = useTranslations('groups');
   const members = useMembers(groupId);
 
+  const [managing, setManaging] = useState(false);
   return (
-    <Section title={t('members.title')}>
+    <section>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-xl font-bold">
+          {t('members.title')}{' '}
+          <span className="text-sm text-muted-foreground">
+            {members.data?.length}
+          </span>
+        </h2>
+        {members.data?.some(
+          (m) =>
+            (canChangeRoles(viewer.role) && m.role !== 'OWNER') ||
+            (m.userId !== viewer.userId && canRemoveMember(viewer, m)),
+        ) && (
+          <Button
+            aria-expanded={managing}
+            variant="secondary"
+            onClick={() => setManaging(!managing)}
+          >
+            {t('members.manage')}
+          </Button>
+        )}
+      </div>
       {members.isPending ? (
         <CollectionSkeleton rows={2} />
       ) : members.isError ? (
         <FormAlert>{t(`errors.${workspaceErrorKey(members.error)}`)}</FormAlert>
       ) : (
-        <ul className="space-y-3">
+        <ul className="divide-y divide-divider">
           {members.data.map((member) => (
             <MemberRow
               key={member.userId}
               member={member}
               groupId={groupId}
               viewer={viewer}
+              managing={managing}
             />
           ))}
         </ul>
       )}
-    </Section>
+    </section>
   );
 }
 
 interface MemberRowProps {
+  managing: boolean;
   member: Member;
   groupId: string;
   viewer: Viewer;
 }
 
-function MemberRow({ member, groupId, viewer }: MemberRowProps) {
+function MemberRow({ member, groupId, viewer, managing }: MemberRowProps) {
   const t = useTranslations('groups');
   const changeRole = useChangeMemberRole();
   const remove = useRemoveMember();
@@ -72,7 +96,7 @@ function MemberRow({ member, groupId, viewer }: MemberRowProps) {
       : null;
 
   return (
-    <li className="space-y-2 rounded-xl border border-divider bg-canvas p-3">
+    <li className="space-y-2 py-3">
       <div className="flex items-center justify-between gap-3">
         <p className="min-w-0 wrap-anywhere font-medium">
           {member.name}
@@ -81,7 +105,7 @@ function MemberRow({ member, groupId, viewer }: MemberRowProps) {
         <RoleBadge role={member.role} />
       </div>
 
-      {showRoleAction || showRemove ? (
+      {managing && (showRoleAction || showRemove) ? (
         <div className="flex flex-wrap gap-2">
           {showRoleAction ? (
             <Button
