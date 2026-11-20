@@ -29,6 +29,8 @@ Group assignments at many universities are coordinated through chat apps, which 
 
 Existing tools are built for professional teams and feel too complex for students. Kompak keeps the board, drops the complexity.
 
+The public introduction is at `/`. Signing in opens the group dashboard at `/groups`.
+
 ## Features
 
 **Core (MVP)**

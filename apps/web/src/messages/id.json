@@ -1,4 +1,80 @@
 {
+  "landing": {
+    "start": "Mulai Sekarang",
+    "login": "Masuk",
+    "nav": "Navigasi utama",
+    "menu": "Menu",
+    "skip": "Langsung ke konten",
+    "features": "Fitur",
+    "show": "Papan tugas",
+    "how": "Cara kerja",
+    "hero": ["Kerja kelompok.", "Tanpa drama."],
+    "intro": "Tugas jelas, progres terlihat, dan semua anggota tetap searah. Dari rencana pertama sampai pekerjaan selesai, kelola semuanya bersama Kompak.",
+    "walk": "Lihat Cara Kerjanya",
+    "sample": "Contoh proyek",
+    "project": "Pameran akhir semester",
+    "team": "Kelompok Studio",
+    "lanes": ["Belum dikerjakan", "Sedang dikerjakan", "Selesai"],
+    "tasks": ["Susun materi pameran", "Rancang poster", "Pilih tema"],
+    "people": ["Nara", "Dimas", "Ayu"],
+    "problem": "Kelompoknya ada. Koordinasinya ke mana?",
+    "issues": [
+      [
+        "Tugas tenggelam di percakapan.",
+        "Pesan tentang tenggat tertutup obrolan berikutnya."
+      ],
+      [
+        "Siapa mengerjakan apa?",
+        "Dua orang membuka bahan yang sama, sementara bagian lain belum disentuh."
+      ],
+      [
+        "Keputusan sulit ditemukan.",
+        "Mencari hasil diskusi kemarin berarti menggulir percakapan dari awal."
+      ]
+    ],
+    "solution": "Satu ruang. Semua lebih terarah.",
+    "benefits": [
+      [
+        "Kelompok dan proyek",
+        "Pisahkan tugas tiap mata kuliah dan temukan kembali proyek dari kelompoknya."
+      ],
+      [
+        "Penanggung jawab dan tenggat",
+        "Buka satu tugas untuk melihat siapa yang mengerjakannya dan kapan perlu selesai."
+      ],
+      ["Diskusi pada tugas", "Simpan masukan di dekat pekerjaan yang dibahas."],
+      [
+        "Bantuan AI",
+        "Urai tugas menjadi usulan subtugas atau ringkas diskusi. Kamu yang memilih usulan yang dipakai."
+      ]
+    ],
+    "experience": "Dari ide sampai selesai.",
+    "experienceBody": "Pindahkan tugas antar kolom saat pekerjaan berubah. Teman sekelompok melihat pembaruannya di papan yang sama.",
+    "detail": "Contoh detail tugas",
+    "assignee": "Penanggung jawab",
+    "discussion": "Diskusi",
+    "comment": "Versi poster sudah siap. Bisa cek ukuran judul sebelum dicetak?",
+    "steps": [
+      [
+        "Buat kelompok",
+        "Buat ruang kelompokmu, lalu bagikan tautan undangan lewat WhatsApp."
+      ],
+      [
+        "Susun pekerjaan",
+        "Buat proyek, tambahkan tugas, dan tentukan penanggung jawabnya."
+      ],
+      [
+        "Bergerak bersama",
+        "Perbarui kolom, diskusikan kendala, dan lanjutkan pekerjaan berikutnya."
+      ]
+    ],
+    "closing": "Kelompok yang kompak dimulai dari sini.",
+    "closingBody": "Lebih sedikit kebingungan. Lebih banyak pekerjaan yang benar-benar selesai bersama.",
+    "footer": "Ruang kerja bersama untuk tugas kuliah.",
+    "quote": "Kerja hebat tumbuh saat semua orang tahu langkah berikutnya.",
+    "credit": "Proyek portofolio Bryan Siagian",
+    "copyright": "Hak cipta Kompak"
+  },
   "ai": {
     "title": "Bantuan AI",
     "disclaimer": "Hasil AI hanya saran. Periksa terlebih dahulu sebelum menambahkan tugas. Isi tugas dan komentar akan dikirim ke penyedia AI yang digunakan aplikasi.",
@@ -30,6 +106,8 @@
     "description": "Tugas kelompok jadi lebih kompak. Bagi tugas, pantau progres, semua dari HP."
   },
   "redesign": {
+    "project": "Proyek",
+    "groupsCount": "{count} kelompok",
     "skip": "Langsung ke konten",
     "navigation": "Navigasi utama",
     "groups": "Kelompok",
@@ -174,7 +252,8 @@
     },
     "list": {
       "greeting": "Halo, {name}!",
-      "title": "Kelompok saya",
+      "title": "Kelompok kamu",
+      "projectTotal": "Total proyek di kelompokmu",
       "empty": "Belum ada kelompok. Buat kelompok pertamamu, lalu bagikan tautannya ke grup WhatsApp.",
       "create": "Buat kelompok",
       "memberCount": "{count} anggota",
@@ -202,6 +281,8 @@
       "notFoundBody": "Mungkin tautannya salah, atau kamu sudah bukan anggota kelompok ini."
     },
     "projects": {
+      "new": "Proyek baru",
+      "actions": "Tindakan untuk {name}",
       "title": "Proyek",
       "descriptionManager": "Satu proyek untuk satu tugas besar. Buka proyeknya untuk melihat kolom dan tugas.",
       "descriptionMember": "Proyek yang dibuat Ketua atau Pengelola muncul di sini. Ketuk untuk membukanya.",
@@ -217,6 +298,7 @@
       "deleteConfirm": "Ya, hapus"
     },
     "members": {
+      "manage": "Kelola anggota",
       "title": "Anggota",
       "you": "(kamu)",
       "makeAdmin": "Jadikan Pengelola",
@@ -226,6 +308,7 @@
       "removeConfirm": "Ya, keluarkan"
     },
     "invite": {
+      "details": "Detail undangan",
       "title": "Ajak teman",
       "description": "Bagikan tautan ini ke grup WhatsApp kelompokmu. Siapa pun yang punya tautannya bisa bergabung.",
       "linkLabel": "Tautan undangan",
