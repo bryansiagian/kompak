@@ -17,7 +17,7 @@ export function Brand({ linked = false }: { linked?: boolean }) {
   );
   return linked ? (
     <Link
-      href="/"
+      href="/groups"
       className="control-focus inline-flex min-h-11 items-center gap-2.5 rounded-lg"
     >
       {mark}
@@ -31,10 +31,12 @@ export function AppShell({
   children,
   actions,
   wide,
+  home,
 }: {
   children: ReactNode;
   actions?: ReactNode;
   wide?: boolean;
+  home?: boolean;
 }) {
   const t = useTranslations('redesign');
   return (
@@ -50,13 +52,13 @@ export function AppShell({
           className={`mx-auto flex min-h-16 items-center justify-between gap-3 px-4 py-2 sm:px-6 ${wide ? 'max-w-[100rem]' : 'max-w-7xl'}`}
         >
           <nav aria-label={t('navigation')} className="flex items-center gap-5">
-            <Brand linked />
-            <Link
-              href="/"
-              className="control-focus hidden min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-emerald-100 hover:bg-white/10 hover:text-white sm:inline-flex"
+            <Brand linked={!home} />
+            <span
+              aria-current={home ? 'page' : 'location'}
+              className="rounded-full bg-brand-tint px-3 py-1.5 text-xs font-semibold text-brand-ink"
             >
-              {t('groups')}
-            </Link>
+              {t(wide ? 'project' : 'groups')}
+            </span>
           </nav>
           {actions}
         </div>
