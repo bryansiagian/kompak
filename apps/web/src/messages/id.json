@@ -29,6 +29,22 @@
     "description": "Tugas kelompok jadi lebih kompak. Bagi tugas, pantau progres, semua dari HP."
   },
   "common": {
+    "loadError": {
+      "temporary": {
+        "title": "Belum bisa memuat halaman",
+        "subtitle": "Periksa koneksi internetmu atau tunggu sebentar, lalu coba lagi."
+      },
+      "forbidden": {
+        "title": "Akses tidak tersedia",
+        "subtitle": "Akunmu belum punya izin untuk membuka halaman ini."
+      },
+      "unexpected": {
+        "title": "Halaman gagal dimuat",
+        "subtitle": "Ada masalah saat menampilkan halaman ini."
+      },
+      "retry": "Coba lagi",
+      "retrying": "Memuat ulang..."
+    },
     "appName": "Kompak",
     "tagline": "Tugas kelompok jadi lebih kompak.",
     "loading": "Sebentar ya…",

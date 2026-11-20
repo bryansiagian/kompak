@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { FormAlert } from '@/components/ui/form-alert';
 import { LinkButton } from '@/components/ui/link-button';
+import { RetryButton, useLoadError } from '@/components/ui/load-error';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { AuthCard } from '@/features/auth/auth-card';
 import { useSession } from '@/features/auth/hooks';
@@ -20,6 +21,11 @@ export function JoinScreen({ code }: { code: string }) {
   const session = useSession();
   const preview = useInvitePreview(code);
   const join = useJoinWorkspace();
+  const invalidInvite = {
+    title: t('invalid.title'),
+    subtitle: t('invalid.subtitle'),
+  };
+  const loadError = useLoadError(preview, invalidInvite, invalidInvite);
 
   const isLoggedIn = Boolean(session.data);
 
@@ -30,16 +36,27 @@ export function JoinScreen({ code }: { code: string }) {
     }
   }, [isLoggedIn]);
 
-  if (preview.isPending || session.isPending) {
+  if (session.isPending) {
     return <LoadingScreen />;
   }
 
-  if (preview.isError) {
+  if (preview.isPending || preview.isError) {
+    if (!loadError) return <LoadingScreen />;
+
     return (
-      <AuthCard title={t('invalid.title')} subtitle={t('invalid.subtitle')}>
-        <LinkButton href="/" fullWidth>
-          {t('invalid.home')}
-        </LinkButton>
+      <AuthCard title={loadError.title} subtitle={loadError.subtitle}>
+        <div className="space-y-3">
+          {loadError.retry ? (
+            <RetryButton {...loadError.retry} fullWidth />
+          ) : null}
+          <LinkButton
+            href="/"
+            variant={loadError.retry ? 'secondary' : 'primary'}
+            fullWidth
+          >
+            {t('invalid.home')}
+          </LinkButton>
+        </div>
       </AuthCard>
     );
   }

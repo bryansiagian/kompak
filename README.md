@@ -42,6 +42,7 @@ Existing tools are built for professional teams and feel too complex for student
 - Real-time sync: changes appear on other members' screens within about a second
 - Task details: description, assignee, due date, labels
 - Mobile-first, Indonesian UI
+- Group, project, and invite pages offer **Coba lagi** after temporary loading failures
 
 **Planned**
 - Comments and activity log

@@ -1,5 +1,31 @@
 @import 'tailwindcss';
 
+@theme {
+  --color-canvas: #fafaf9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f5f4;
+  --color-foreground: #1c1917;
+  --color-muted-foreground: #57534e;
+  --color-divider: #e7e5e4;
+  --color-control-border: #78716c;
+  --color-primary: #047857;
+  --color-primary-hover: #065f46;
+  --color-on-primary: #ffffff;
+  --color-focus: #047857;
+  --color-danger: #b91c1c;
+  --color-danger-hover: #991b1b;
+  --color-on-danger: #ffffff;
+  --color-danger-surface: #fef2f2;
+}
+
+@utility control-focus {
+  @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus;
+}
+
+@utility field-control {
+  @apply min-h-11 w-full rounded-xl border bg-surface px-3.5 text-base text-foreground transition-colors control-focus disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-muted-foreground;
+}
+
 :root {
   color-scheme: light;
 }

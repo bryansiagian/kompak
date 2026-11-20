@@ -1,19 +1,19 @@
-import type { ButtonHTMLAttributes } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
 interface ButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
+  extends Omit<ComponentPropsWithRef<'button'>, 'className'> {
   variant?: ButtonVariant;
   fullWidth?: boolean;
 }
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    'bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-emerald-400',
+    'border-transparent bg-primary text-on-primary not-disabled:not-aria-disabled:hover:bg-primary-hover',
   secondary:
-    'bg-white text-stone-800 ring-1 ring-stone-300 hover:bg-stone-100 disabled:text-stone-400',
-  danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400',
+    'border-control-border bg-surface text-foreground not-disabled:not-aria-disabled:hover:bg-surface-muted',
+  danger: 'border-transparent bg-danger text-on-danger not-disabled:not-aria-disabled:hover:bg-danger-hover',
 };
 
 // Dipakai juga oleh tautan yang tampil seperti tombol.
@@ -21,7 +21,7 @@ export function buttonClassName(
   variant: ButtonVariant = 'primary',
   fullWidth = false,
 ): string {
-  return `min-h-11 rounded-xl px-4 text-base font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed ${
+  return `min-h-11 rounded-xl border px-4 py-2 text-base font-semibold transition-colors control-focus disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60 ${
     VARIANT_CLASSES[variant]
   } ${fullWidth ? 'w-full' : ''}`;
 }

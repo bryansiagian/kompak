@@ -13,7 +13,7 @@ export function TextArea({ label, error, rows = 4, ...props }: TextAreaProps) {
 
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-medium text-stone-700">
+      <label htmlFor={id} className="block text-sm font-medium text-foreground">
         {label}
       </label>
       <textarea
@@ -21,13 +21,13 @@ export function TextArea({ label, error, rows = 4, ...props }: TextAreaProps) {
         rows={rows}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
-        className={`w-full rounded-xl border bg-white px-3.5 py-2.5 text-base outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-600 ${
-          error ? 'border-red-500' : 'border-stone-300'
+        className={`field-control py-2.5 ${
+          error ? 'border-danger' : 'border-control-border'
         }`}
         {...props}
       />
       {error ? (
-        <p id={errorId} role="alert" className="text-sm text-red-600">
+        <p id={errorId} role="alert" className="text-sm text-danger">
           {error}
         </p>
       ) : null}

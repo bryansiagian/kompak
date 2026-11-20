@@ -16,24 +16,24 @@ export function TextField({ label, hint, error, ...props }: TextFieldProps) {
 
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-medium text-stone-700">
+      <label htmlFor={id} className="block text-sm font-medium text-foreground">
         {label}
       </label>
       <input
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className={`min-h-11 w-full rounded-xl border bg-white px-3.5 text-base outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-600 ${
-          error ? 'border-red-500' : 'border-stone-300'
+        className={`field-control ${
+          error ? 'border-danger' : 'border-control-border'
         }`}
         {...props}
       />
       {error ? (
-        <p id={errorId} role="alert" className="text-sm text-red-600">
+        <p id={errorId} role="alert" className="text-sm text-danger">
           {error}
         </p>
       ) : hint ? (
-        <p id={hintId} className="text-sm text-stone-500">
+        <p id={hintId} className="text-sm text-muted-foreground">
           {hint}
         </p>
       ) : null}

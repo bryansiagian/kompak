@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { AuthUser } from '@kompak/shared';
+import { RetryButton, useLoadError } from '@/components/ui/load-error';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { TextLink } from '@/components/ui/text-link';
 import { RequireAuth } from '@/features/auth/require-auth';
@@ -25,15 +26,25 @@ function GroupContent({ groupId, user }: { groupId: string; user: AuthUser }) {
   const t = useTranslations('groups.detail');
   const workspace = useWorkspace(groupId);
 
-  if (workspace.isPending) {
-    return <LoadingScreen />;
-  }
+  const loadError = useLoadError(workspace, {
+    title: t('notFoundTitle'),
+    subtitle: t('notFoundBody'),
+  });
 
-  if (workspace.isError) {
+  if (workspace.isPending || workspace.isError) {
+    if (!loadError) return <LoadingScreen />;
+
     return (
       <main className="mx-auto min-h-dvh w-full max-w-md space-y-3 px-4 py-8">
-        <h1 className="text-xl font-bold">{t('notFoundTitle')}</h1>
-        <p className="text-sm text-stone-600">{t('notFoundBody')}</p>
+        <h1 className="text-xl font-bold">{loadError.title}</h1>
+        <p role="alert" className="text-sm text-muted-foreground">
+          {loadError.subtitle}
+        </p>
+        {loadError.retry ? (
+          <div>
+            <RetryButton {...loadError.retry} />
+          </div>
+        ) : null}
         <TextLink href="/">{t('back')}</TextLink>
       </main>
     );
