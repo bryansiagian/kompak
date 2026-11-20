@@ -148,7 +148,9 @@ function CommentRow({ cardId, comment, viewer }: CommentRowProps) {
           </div>
         </form>
       ) : (
-        <p className="whitespace-pre-wrap break-words text-sm">{comment.body}</p>
+        <p className="wrap-anywhere whitespace-pre-wrap text-sm">
+          {comment.body}
+        </p>
       )}
 
       {!editing && (mayEdit || mayDelete) ? (

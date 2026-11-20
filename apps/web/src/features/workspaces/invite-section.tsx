@@ -42,7 +42,11 @@ export function InviteSection({ workspace }: { workspace: WorkspaceDetail }) {
   }
 
   return (
-    <Section title={t('invite.title')} description={t('invite.description')}>
+    <Section
+      id="group-invite"
+      title={t('invite.title')}
+      description={t('invite.description')}
+    >
       <div className="space-y-3">
         <TextField
           label={t('invite.linkLabel')}
@@ -62,6 +66,9 @@ export function InviteSection({ workspace }: { workspace: WorkspaceDetail }) {
         >
           {t('invite.whatsapp')}
         </a>
+        <p role="status" className="sr-only">
+          {copyState === 'copied' ? t('invite.copied') : ''}
+        </p>
         <Button variant="secondary" fullWidth onClick={handleCopy}>
           {copyState === 'copied' ? t('invite.copied') : t('invite.copy')}
         </Button>

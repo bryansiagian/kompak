@@ -5,6 +5,7 @@ import type { Member, WorkspaceRole } from '@kompak/shared';
 import { Button } from '@/components/ui/button';
 import { ConfirmAction } from '@/components/ui/confirm-action';
 import { FormAlert } from '@/components/ui/form-alert';
+import { CollectionSkeleton } from '@/components/ui/collection-state';
 import { Section } from '@/components/ui/section';
 import { workspaceErrorKey } from './errors';
 import { useChangeMemberRole, useMembers, useRemoveMember } from './hooks';
@@ -23,15 +24,12 @@ interface MembersSectionProps {
 
 export function MembersSection({ groupId, viewer }: MembersSectionProps) {
   const t = useTranslations('groups');
-  const tCommon = useTranslations('common');
   const members = useMembers(groupId);
 
   return (
     <Section title={t('members.title')}>
       {members.isPending ? (
-        <p role="status" className="text-sm text-stone-600">
-          {tCommon('loading')}
-        </p>
+        <CollectionSkeleton rows={2} />
       ) : members.isError ? (
         <FormAlert>{t(`errors.${workspaceErrorKey(members.error)}`)}</FormAlert>
       ) : (
@@ -74,9 +72,9 @@ function MemberRow({ member, groupId, viewer }: MemberRowProps) {
       : null;
 
   return (
-    <li className="space-y-2 rounded-xl p-3 ring-1 ring-stone-200">
+    <li className="space-y-2 rounded-xl border border-divider bg-canvas p-3">
       <div className="flex items-center justify-between gap-3">
-        <p className="min-w-0 truncate font-medium">
+        <p className="min-w-0 wrap-anywhere font-medium">
           {member.name}
           {isSelf ? ` ${t('members.you')}` : ''}
         </p>

@@ -8,6 +8,10 @@ import type { Board, WorkspaceRole } from '@kompak/shared';
 import { Button } from '@/components/ui/button';
 import { ConfirmAction } from '@/components/ui/confirm-action';
 import { FormAlert } from '@/components/ui/form-alert';
+import {
+  CollectionSkeleton,
+  EmptyState,
+} from '@/components/ui/collection-state';
 import { Section } from '@/components/ui/section';
 import { TextField } from '@/components/ui/text-field';
 import { TextLink } from '@/components/ui/text-link';
@@ -27,7 +31,6 @@ interface ProjectsSectionProps {
 
 export function ProjectsSection({ groupId, role }: ProjectsSectionProps) {
   const t = useTranslations('groups');
-  const tCommon = useTranslations('common');
   const boards = useBoards(groupId);
   const manage = canManage(role);
 
@@ -42,17 +45,17 @@ export function ProjectsSection({ groupId, role }: ProjectsSectionProps) {
     >
       <div className="space-y-4">
         {boards.isPending ? (
-          <p role="status" className="text-sm text-stone-600">
-            {tCommon('loading')}
-          </p>
+          <CollectionSkeleton rows={2} />
         ) : boards.isError ? (
-          <FormAlert>{t(`errors.${workspaceErrorKey(boards.error)}`)}</FormAlert>
+          <FormAlert>
+            {t(`errors.${workspaceErrorKey(boards.error)}`)}
+          </FormAlert>
         ) : boards.data.length === 0 ? (
-          <p className="text-sm text-stone-600">
+          <EmptyState>
             {manage ? t('projects.emptyManager') : t('projects.emptyMember')}
-          </p>
+          </EmptyState>
         ) : (
-          <ul className="space-y-2">
+          <ul className="grid gap-3 sm:grid-cols-2">
             {boards.data.map((board) => (
               <BoardRow key={board.id} board={board} manage={manage} />
             ))}
@@ -96,7 +99,7 @@ function BoardRow({ board, manage }: { board: Board; manage: boolean }) {
       : null;
 
   return (
-    <li className="space-y-2 rounded-xl p-3 ring-1 ring-stone-200">
+    <li className="min-w-0 space-y-2 rounded-xl border border-divider bg-canvas p-3">
       {editing ? (
         <form onSubmit={handleRename} noValidate className="space-y-3">
           <TextField
@@ -117,7 +120,7 @@ function BoardRow({ board, manage }: { board: Board; manage: boolean }) {
       ) : (
         <>
           <TextLink href={`/groups/${board.workspaceId}/projects/${board.id}`}>
-            {board.name}
+            <span className="wrap-anywhere">{board.name}</span>
           </TextLink>
           {manage ? (
             <div className="flex flex-wrap gap-2">
@@ -171,7 +174,11 @@ function AddBoardForm({ groupId }: { groupId: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-3">
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="space-y-3 rounded-xl border border-divider bg-brand-tint p-4"
+    >
       <TextField
         name="name"
         label={t('projects.name')}

@@ -12,8 +12,12 @@ export function ConnectionBanner({ status }: { status: ConnectionStatus }) {
   return (
     <p
       role="status"
-      className="mt-3 rounded-xl bg-amber-50 px-3.5 py-3 text-sm text-amber-900"
+      className="mt-4 flex items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900"
     >
+      <span
+        aria-hidden="true"
+        className="size-2 shrink-0 rounded-full bg-amber-700"
+      />
       {t('reconnecting')}
     </p>
   );

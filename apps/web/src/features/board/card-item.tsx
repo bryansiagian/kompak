@@ -43,7 +43,7 @@ export function CardView({
 
   return (
     <div
-      className={`flex items-stretch rounded-xl bg-white ring-1 ring-stone-200 ${
+      className={`flex items-stretch rounded-xl border border-divider bg-surface shadow-panel ${
         overlay ? 'shadow-lg' : 'shadow-sm'
       }`}
     >
@@ -53,14 +53,19 @@ export function CardView({
         onClick={onOpen}
         className="min-h-11 min-w-0 flex-1 rounded-xl p-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
       >
-        <span className="block break-words font-medium">{card.title}</span>
+        <span className="block wrap-anywhere font-semibold">{card.title}</span>
         {card.labelIds.length > 0 ? (
           <span className="mt-1.5 flex flex-wrap gap-1">
-            {labels.filter((label) => card.labelIds.includes(label.id)).map((label) => (
-              <span key={label.id} className={`rounded-full px-2 py-0.5 text-xs ${LABEL_STYLE[label.color]}`}>
-                {label.name}
-              </span>
-            ))}
+            {labels
+              .filter((label) => card.labelIds.includes(label.id))
+              .map((label) => (
+                <span
+                  key={label.id}
+                  className={`rounded-full px-2 py-0.5 text-xs ${LABEL_STYLE[label.color]}`}
+                >
+                  {label.name}
+                </span>
+              ))}
           </span>
         ) : null}
         {due || assigneeName ? (
@@ -107,7 +112,12 @@ interface SortableCardProps {
   onOpen: () => void;
 }
 
-export function SortableCard({ card, labels, assigneeName, onOpen }: SortableCardProps) {
+export function SortableCard({
+  card,
+  labels,
+  assigneeName,
+  onOpen,
+}: SortableCardProps) {
   const t = useTranslations('board.card');
   const {
     attributes,
@@ -136,7 +146,7 @@ export function SortableCard({ card, labels, assigneeName, onOpen }: SortableCar
             type="button"
             ref={setActivatorNodeRef}
             aria-label={t('drag', { title: card.title })}
-            className="flex min-h-11 w-9 shrink-0 touch-none items-center justify-center rounded-l-xl text-stone-400 hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+            className="flex min-h-11 w-11 shrink-0 touch-none items-center justify-center rounded-l-xl text-muted-foreground hover:bg-brand-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
             {...attributes}
             {...listeners}
           >

@@ -2,6 +2,8 @@
 
 import { useTranslations } from 'next-intl';
 import type { AuthUser } from '@kompak/shared';
+import { AppShell, PageHeader } from '@/components/ui/app-shell';
+import { Section } from '@/components/ui/section';
 import { RetryButton, useLoadError } from '@/components/ui/load-error';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { TextLink } from '@/components/ui/text-link';
@@ -24,6 +26,7 @@ export function GroupScreen({ groupId }: { groupId: string }) {
 
 function GroupContent({ groupId, user }: { groupId: string; user: AuthUser }) {
   const t = useTranslations('groups.detail');
+  const design = useTranslations('redesign');
   const workspace = useWorkspace(groupId);
 
   const loadError = useLoadError(workspace, {
@@ -35,41 +38,60 @@ function GroupContent({ groupId, user }: { groupId: string; user: AuthUser }) {
     if (!loadError) return <LoadingScreen />;
 
     return (
-      <main className="mx-auto min-h-dvh w-full max-w-md space-y-3 px-4 py-8">
-        <h1 className="text-xl font-bold">{loadError.title}</h1>
-        <p role="alert" className="text-sm text-muted-foreground">
-          {loadError.subtitle}
-        </p>
-        {loadError.retry ? (
-          <div>
-            <RetryButton {...loadError.retry} />
-          </div>
-        ) : null}
-        <TextLink href="/">{t('back')}</TextLink>
-      </main>
+      <AppShell>
+        <div className="mx-auto max-w-lg space-y-3 rounded-2xl border border-divider bg-surface p-5">
+          <h1 className="text-xl font-bold">{loadError.title}</h1>
+          <p role="alert" className="text-sm text-muted-foreground">
+            {loadError.subtitle}
+          </p>
+          {loadError.retry ? (
+            <div>
+              <RetryButton {...loadError.retry} />
+            </div>
+          ) : null}
+          <TextLink href="/">{t('back')}</TextLink>
+        </div>
+      </AppShell>
     );
   }
 
   const { data } = workspace;
 
   return (
-    <main className="mx-auto min-h-dvh w-full max-w-md space-y-5 px-4 py-6">
+    <AppShell>
       <TextLink href="/">{t('back')}</TextLink>
-      <header className="flex items-center justify-between gap-3">
-        <h1 className="min-w-0 break-words text-2xl font-extrabold tracking-tight">
-          {data.name}
-        </h1>
+      <PageHeader title={data.name} description={design('groupDescription')}>
         <RoleBadge role={data.role} />
-      </header>
-
-      <ProjectsSection groupId={data.id} role={data.role} />
-      <WorkspaceSearch workspaceId={data.id} />
-      <InviteSection workspace={data} />
-      <MembersSection
-        groupId={data.id}
-        viewer={{ userId: user.id, role: data.role }}
-      />
-      <GroupSettings workspace={data} currentUserId={user.id} />
-    </main>
+        <a
+          href="#group-invite"
+          className="control-focus inline-flex min-h-11 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover"
+        >
+          {design('inviteAction')}
+        </a>
+      </PageHeader>
+      <div className="mt-6 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-w-0 space-y-5">
+          <ProjectsSection groupId={data.id} role={data.role} />
+          <Section title={design('taskSearch')}>
+            <WorkspaceSearch workspaceId={data.id} />
+          </Section>
+        </div>
+        <aside className="min-w-0 space-y-5" aria-label={design('groups')}>
+          <InviteSection workspace={data} />
+          <MembersSection
+            groupId={data.id}
+            viewer={{ userId: user.id, role: data.role }}
+          />
+          <details className="rounded-2xl border border-divider bg-surface">
+            <summary className="control-focus min-h-11 cursor-pointer rounded-2xl px-4 py-3 font-semibold">
+              {design('settings')}
+            </summary>
+            <div className="p-2 pt-0">
+              <GroupSettings workspace={data} currentUserId={user.id} />
+            </div>
+          </details>
+        </aside>
+      </div>
+    </AppShell>
   );
 }

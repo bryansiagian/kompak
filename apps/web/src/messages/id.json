@@ -22,11 +22,39 @@
     "hint": "Ketik minimal 2 karakter untuk mencari tugas.",
     "loading": "Mencari tugas...",
     "error": "Pencarian gagal. Silakan coba lagi.",
+    "results": "{count} hasil pencarian",
     "empty": "Tidak ada tugas yang cocok dengan pencarian."
   },
   "meta": {
     "title": "Kompak",
     "description": "Tugas kelompok jadi lebih kompak. Bagi tugas, pantau progres, semua dari HP."
+  },
+  "redesign": {
+    "skip": "Langsung ke konten",
+    "navigation": "Navigasi utama",
+    "groups": "Kelompok",
+    "authHeading": "Kerja kelompok jadi lebih kompak.",
+    "authGroups": "Buat kelompok dan proyek",
+    "authTasks": "Bagi tugas dan pantau tenggat",
+    "authShare": "Undang teman lewat WhatsApp",
+    "taskSearch": "Pencarian tugas",
+    "settings": "Pengaturan kelompok",
+    "groupDescription": "Temukan proyek, cari tugas, dan ajak teman satu kelompok.",
+    "inviteAction": "Undang teman",
+    "columnGo": "Lihat",
+    "columnSelect": "Pilih kolom",
+    "columnJump": "Lompat ke kolom",
+    "boardTools": "Filter dan pengaturan papan",
+    "filteredEmpty": "Tidak ada tugas yang cocok di kolom ini.",
+    "discussion": "Diskusi dan riwayat",
+    "taskTools": "Label dan bantuan AI",
+    "taskDelete": "Kelola tugas",
+    "boardSearch": "Cari tugas di proyek",
+    "boardSearchPlaceholder": "Cari judul atau deskripsi tugas",
+    "boardLayout": "Papan tugas",
+    "moving": "Sedang memindahkan tugas...",
+    "moveFailed": "Tugas belum berhasil dipindahkan. Coba lagi ya.",
+    "taskDetails": "Rincian tugas"
   },
   "common": {
     "loadError": {
@@ -370,6 +398,16 @@
     "deleteConfirm": "Hapus label \"{name}\"?",
     "name": "Nama label",
     "color": "Warna label",
+    "colors": {
+      "emerald": "Hijau",
+      "amber": "Kuning",
+      "sky": "Biru muda",
+      "rose": "Merah muda",
+      "violet": "Ungu",
+      "teal": "Hijau kebiruan",
+      "orange": "Jingga",
+      "stone": "Abu-abu"
+    },
     "error": "Gagal menyimpan perubahan label. Silakan coba lagi.",
     "save": "Simpan perubahan",
     "create": "Tambah label",
@@ -390,5 +428,4 @@
     "showing": "Menampilkan {count} dari {total} tugas",
     "clear": "Hapus filter"
   }
-
 }

@@ -16,6 +16,10 @@
   --color-danger-hover: #991b1b;
   --color-on-danger: #ffffff;
   --color-danger-surface: #fef2f2;
+  --color-brand-tint: #ecf6ef;
+  --color-brand-ink: #123529;
+  --color-board-lane: #efeeea;
+  --shadow-panel: 0 1px 2px rgb(28 25 23 / 0.06);
 }
 
 @utility control-focus {

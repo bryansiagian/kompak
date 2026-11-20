@@ -1,6 +1,6 @@
-
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MAX_LABELS_PER_CARD } from '@kompak/shared';
@@ -42,7 +42,7 @@ export function CardLabels({ board, card }: CardLabelsProps) {
     <section className="space-y-2">
       <h3 className="font-semibold">{t('taskLabels')}</h3>
 
-      <div className="max-h-48 space-y-1 overflow-y-auto">
+      <div className="max-h-48 space-y-1 overflow-y-auto overscroll-contain">
         {board.labels.map((label) => (
           <label
             key={label.id}
@@ -71,14 +71,13 @@ export function CardLabels({ board, card }: CardLabelsProps) {
         </p>
       ) : null}
 
-      <button
-        type="button"
+      <Button
+        variant="secondary"
         disabled={mutation.isPending}
-        className="min-h-11 rounded-lg border px-3 text-sm disabled:opacity-50"
         onClick={applyLabels}
       >
         {t('apply')}
-      </button>
+      </Button>
     </section>
   );
 }

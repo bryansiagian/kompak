@@ -39,7 +39,7 @@ export function AddListForm({ boardId }: { boardId: string }) {
   }
 
   return (
-    <div className="w-[82vw] max-w-72 shrink-0 rounded-2xl bg-stone-100/60 p-3 sm:w-72">
+    <div className="w-[calc(100vw-4.5rem)] max-w-80 shrink-0 rounded-xl border border-dashed border-control-border/50 bg-surface p-3 sm:w-76">
       {open ? (
         <form onSubmit={handleSubmit} noValidate className="space-y-2">
           <TextField
