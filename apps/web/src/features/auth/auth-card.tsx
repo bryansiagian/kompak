@@ -23,16 +23,19 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   const design = useTranslations('redesign');
 
   return (
-    <main className="mx-auto grid min-h-dvh w-full max-w-6xl content-center gap-6 px-4 py-8 sm:px-8 lg:grid-cols-[1fr_1.05fr] lg:items-stretch lg:gap-0">
-      <aside className="auth-jacket relative isolate overflow-hidden rounded-3xl bg-brand-ink p-5 text-white sm:p-8 lg:flex lg:flex-col lg:justify-between lg:rounded-r-none lg:p-12">
+    <main className="mx-auto grid min-h-dvh w-full max-w-6xl content-center gap-3 px-4 py-8 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-stretch lg:gap-4">
+      <aside className="auth-jacket relative isolate overflow-hidden rounded-3xl bg-brand-ink p-5 text-white sm:p-8 lg:flex lg:flex-col lg:justify-between lg:rounded-3xl lg:p-10">
         <Brand />
-        <div className="mt-4 lg:mt-16">
+        <div aria-hidden="true" className="auth-symbol hidden">
+          <i />
+          <i />
+          <i />
+        </div>
+        <div className="hidden lg:block">
           <p className="display-heading hidden max-w-sm lg:block">
             {design('authHeading')}
           </p>
-          <p className="max-w-sm text-sm lg:mt-4 lg:text-base">
-            {t('tagline')}
-          </p>
+          <p className="sr-only">{t('tagline')}</p>
         </div>
         <ul className="mt-10 hidden space-y-3 text-sm font-semibold lg:block">
           {[design('authGroups'), design('authTasks'), design('authShare')].map(
@@ -40,7 +43,7 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
               <li key={item} className="flex items-center gap-3">
                 <span
                   aria-hidden="true"
-                  className="size-2 rounded-full bg-emerald-200"
+                  className="size-2 rounded-full bg-brand-tint"
                 />
                 {item}
               </li>
@@ -48,7 +51,7 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
           )}
         </ul>
       </aside>
-      <div className="rounded-3xl border border-divider bg-surface p-5 shadow-panel sm:p-8 lg:rounded-l-none lg:p-12">
+      <div className="rounded-3xl border border-divider bg-surface p-5 shadow-panel sm:p-8 lg:rounded-3xl lg:p-12">
         <h1 className="display-heading wrap-anywhere">{title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
         <div className="mt-6">{children}</div>
