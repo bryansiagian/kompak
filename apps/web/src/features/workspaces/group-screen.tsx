@@ -2,6 +2,8 @@
 
 import { useTranslations } from 'next-intl';
 import type { AuthUser } from '@kompak/shared';
+import { AppShell } from '@/components/ui/app-shell';
+import { RetryButton, useLoadError } from '@/components/ui/load-error';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { TextLink } from '@/components/ui/text-link';
 import { RequireAuth } from '@/features/auth/require-auth';
@@ -23,42 +25,75 @@ export function GroupScreen({ groupId }: { groupId: string }) {
 
 function GroupContent({ groupId, user }: { groupId: string; user: AuthUser }) {
   const t = useTranslations('groups.detail');
+  const design = useTranslations('redesign');
   const workspace = useWorkspace(groupId);
 
-  if (workspace.isPending) {
-    return <LoadingScreen />;
-  }
+  const loadError = useLoadError(workspace, {
+    title: t('notFoundTitle'),
+    subtitle: t('notFoundBody'),
+  });
 
-  if (workspace.isError) {
+  if (workspace.isPending || workspace.isError) {
+    if (!loadError) return <LoadingScreen />;
+
     return (
-      <main className="mx-auto min-h-dvh w-full max-w-md space-y-3 px-4 py-8">
-        <h1 className="text-xl font-bold">{t('notFoundTitle')}</h1>
-        <p className="text-sm text-stone-600">{t('notFoundBody')}</p>
-        <TextLink href="/">{t('back')}</TextLink>
-      </main>
+      <AppShell>
+        <div className="mx-auto max-w-lg space-y-3 rounded-2xl border border-divider bg-surface p-5">
+          <h1 className="text-xl font-bold">{loadError.title}</h1>
+          <p role="alert" className="text-sm text-muted-foreground">
+            {loadError.subtitle}
+          </p>
+          {loadError.retry ? (
+            <div>
+              <RetryButton {...loadError.retry} />
+            </div>
+          ) : null}
+          <TextLink href="/groups">{t('back')}</TextLink>
+        </div>
+      </AppShell>
     );
   }
 
   const { data } = workspace;
 
   return (
-    <main className="mx-auto min-h-dvh w-full max-w-md space-y-5 px-4 py-6">
-      <TextLink href="/">{t('back')}</TextLink>
-      <header className="flex items-center justify-between gap-3">
-        <h1 className="min-w-0 break-words text-2xl font-extrabold tracking-tight">
+    <AppShell>
+      <TextLink href="/groups">{t('back')}</TextLink>
+      <header className="my-4 flex flex-wrap items-center gap-3 border-b border-divider pb-5">
+        <h1 className="min-w-0 wrap-anywhere text-3xl font-bold tracking-tight sm:text-5xl">
           {data.name}
         </h1>
         <RoleBadge role={data.role} />
+        <a
+          href="#workspace-invitation"
+          className="control-focus inline-flex min-h-11 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover"
+        >
+          {design('inviteAction')}
+        </a>
       </header>
-
-      <ProjectsSection groupId={data.id} role={data.role} />
-      <WorkspaceSearch workspaceId={data.id} />
-      <InviteSection workspace={data} />
-      <MembersSection
-        groupId={data.id}
-        viewer={{ userId: user.id, role: data.role }}
-      />
-      <GroupSettings workspace={data} currentUserId={user.id} />
-    </main>
+      <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-10">
+        <div className="min-w-0 space-y-6">
+          <ProjectsSection groupId={data.id} role={data.role} />
+          <div className="border-t border-divider pt-5">
+            <WorkspaceSearch workspaceId={data.id} />
+          </div>
+        </div>
+        <aside className="min-w-0 space-y-5">
+          <InviteSection workspace={data} />
+          <MembersSection
+            groupId={data.id}
+            viewer={{ userId: user.id, role: data.role }}
+          />
+          <details className="border-t border-divider">
+            <summary className="control-focus min-h-11 cursor-pointer rounded-2xl px-4 py-3 font-semibold">
+              {design('settings')}
+            </summary>
+            <div className="p-2 pt-0">
+              <GroupSettings workspace={data} currentUserId={user.id} />
+            </div>
+          </details>
+        </aside>
+      </div>
+    </AppShell>
   );
 }

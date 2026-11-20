@@ -38,6 +38,7 @@ export function ListColumn({
   onMoveList,
 }: ListColumnProps) {
   const t = useTranslations('board');
+  const design = useTranslations('redesign');
   // Seluruh badan kolom menjadi area lepas, sehingga kolom kosong pun bisa menerima tugas.
   const { setNodeRef, isOver } = useDroppable({
     id: listDroppableId(list.id),
@@ -45,8 +46,10 @@ export function ListColumn({
 
   return (
     <section
+      id={`lane-${list.id}`}
+      tabIndex={-1}
       aria-label={list.name}
-      className="w-[82vw] max-w-72 shrink-0 rounded-2xl bg-stone-100 p-3 sm:w-72"
+      className="control-focus w-[calc(100vw-4.5rem)] max-w-80 shrink-0 rounded-xl border border-divider bg-board-lane p-3 sm:w-76"
     >
       <ListHeader
         boardId={boardId}
@@ -57,10 +60,13 @@ export function ListColumn({
         onMove={onMoveList}
       />
 
+      <div className="mt-3">
+        <QuickAddCard boardId={boardId} listId={list.id} />
+      </div>
       <div
         ref={setNodeRef}
         className={`mt-3 min-h-16 space-y-2 rounded-xl ${
-          isOver ? 'bg-emerald-50' : ''
+          isOver ? 'bg-brand-tint ring-2 ring-inset ring-primary' : ''
         }`}
       >
         <SortableContext
@@ -88,12 +94,10 @@ export function ListColumn({
           )}
         </SortableContext>
         {list.cards.length === 0 ? (
-          <p className="px-1 py-2 text-sm text-stone-500">{t('emptyList')}</p>
+          <p className="rounded-xl border border-dashed border-control-border/50 px-3 py-4 text-sm text-muted-foreground">
+            {dragDisabled ? design('filteredEmpty') : t('emptyList')}
+          </p>
         ) : null}
-      </div>
-
-      <div className="mt-3">
-        <QuickAddCard boardId={boardId} listId={list.id} />
       </div>
     </section>
   );

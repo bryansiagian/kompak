@@ -29,6 +29,8 @@ Group assignments at many universities are coordinated through chat apps, which 
 
 Existing tools are built for professional teams and feel too complex for students. Kompak keeps the board, drops the complexity.
 
+The public introduction is at `/`. Signing in opens the group dashboard at `/groups`.
+
 ## Features
 
 **Core (MVP)**
@@ -41,7 +43,8 @@ Existing tools are built for professional teams and feel too complex for student
 - Drag and drop to reorder and move tasks, with touch support and a non-drag alternative
 - Real-time sync: changes appear on other members' screens within about a second
 - Task details: description, assignee, due date, labels
-- Mobile-first, Indonesian UI
+- Mobile-first Indonesian UI with a group dashboard, workspace search, and a Kanban board with a column picker and project search
+- Group, project, and invite pages offer **Coba lagi** after temporary loading failures
 
 **Planned**
 - Comments and activity log

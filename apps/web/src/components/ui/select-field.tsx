@@ -20,12 +20,12 @@ export function SelectField({ label, options, ...props }: SelectFieldProps) {
 
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-medium text-stone-700">
+      <label htmlFor={id} className="block text-sm font-medium text-foreground">
         {label}
       </label>
       <select
         id={id}
-        className="min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-base outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-600"
+        className="field-control border-control-border"
         {...props}
       >
         {options.map((option) => (

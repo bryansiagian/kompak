@@ -6,7 +6,6 @@ import type { WorkspaceDetail } from '@kompak/shared';
 import { Button, buttonClassName } from '@/components/ui/button';
 import { ConfirmAction } from '@/components/ui/confirm-action';
 import { FormAlert } from '@/components/ui/form-alert';
-import { Section } from '@/components/ui/section';
 import { TextField } from '@/components/ui/text-field';
 import { workspaceErrorKey } from './errors';
 import { useRegenerateInvite } from './hooks';
@@ -42,48 +41,65 @@ export function InviteSection({ workspace }: { workspace: WorkspaceDetail }) {
   }
 
   return (
-    <Section title={t('invite.title')} description={t('invite.description')}>
-      <div className="space-y-3">
-        <TextField
-          label={t('invite.linkLabel')}
-          readOnly
-          value={link}
-          onFocus={(event) => event.currentTarget.select()}
-        />
-        <p className="text-sm text-stone-600">
-          {t('invite.codeLabel', { code: workspace.inviteCode })}
-        </p>
-
+    <section
+      id="workspace-invitation"
+      className="scroll-mt-4 rounded-2xl bg-primary p-5 text-white"
+    >
+      <h2 className="text-xl font-bold">{t('invite.title')}</h2>
+      <p className="mt-1 text-sm">{t('invite.description')}</p>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         <a
           href={whatsAppShareUrl(shareText)}
           target="_blank"
           rel="noopener noreferrer"
-          className={`${buttonClassName('primary', true)} inline-flex items-center justify-center`}
+          className={`${buttonClassName('secondary')} inline-flex items-center justify-center`}
         >
           {t('invite.whatsapp')}
         </a>
-        <Button variant="secondary" fullWidth onClick={handleCopy}>
+        <p role="status" className="sr-only">
+          {copyState === 'copied' ? t('invite.copied') : ''}
+        </p>
+        <Button variant="secondary" onClick={handleCopy}>
           {copyState === 'copied' ? t('invite.copied') : t('invite.copy')}
         </Button>
         {copyState === 'failed' ? (
           <FormAlert>{t('invite.copyFailed')}</FormAlert>
         ) : null}
-
-        {canManage(workspace.role) ? (
-          <ConfirmAction
-            label={t('invite.regenerate')}
-            prompt={t('invite.regeneratePrompt')}
-            confirmLabel={t('invite.regenerateConfirm')}
-            disabled={regenerate.isPending}
-            onConfirm={() => regenerate.mutate(workspace.id)}
-          />
-        ) : null}
-        {regenerate.isError ? (
-          <FormAlert>
-            {t(`errors.${workspaceErrorKey(regenerate.error)}`)}
-          </FormAlert>
-        ) : null}
       </div>
-    </Section>
+      <details
+        open={copyState === 'failed' || undefined}
+        className="mt-3 border-t border-white/30"
+      >
+        <summary className="control-focus min-h-11 cursor-pointer py-3 text-sm font-medium">
+          {t('invite.details')}
+        </summary>
+        <div className="space-y-3 rounded-xl bg-surface p-3 text-foreground">
+          {' '}
+          <TextField
+            label={t('invite.linkLabel')}
+            readOnly
+            value={link}
+            onFocus={(event) => event.currentTarget.select()}
+          />
+          <p className="text-sm text-stone-600">
+            {t('invite.codeLabel', { code: workspace.inviteCode })}
+          </p>
+          {canManage(workspace.role) ? (
+            <ConfirmAction
+              label={t('invite.regenerate')}
+              prompt={t('invite.regeneratePrompt')}
+              confirmLabel={t('invite.regenerateConfirm')}
+              disabled={regenerate.isPending}
+              onConfirm={() => regenerate.mutate(workspace.id)}
+            />
+          ) : null}
+          {regenerate.isError ? (
+            <FormAlert>
+              {t(`errors.${workspaceErrorKey(regenerate.error)}`)}
+            </FormAlert>
+          ) : null}
+        </div>
+      </details>
+    </section>
   );
 }

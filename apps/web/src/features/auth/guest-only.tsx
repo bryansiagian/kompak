@@ -14,7 +14,7 @@ export function GuestOnly({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (user) {
       // Tujuan disimpan oleh halaman undangan; dibersihkan di sana setelah tiba.
-      router.replace(peekNextPath() ?? '/');
+      router.replace(peekNextPath() ?? '/groups');
     }
   }, [user, router]);
 

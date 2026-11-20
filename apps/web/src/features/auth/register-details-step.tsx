@@ -129,7 +129,7 @@ export function RegisterDetailsStep({
         </Button>
         {resendError ? <FormAlert>{resendError}</FormAlert> : null}
         {resend.isSuccess && secondsLeft > 0 ? (
-          <p role="status" className="text-center text-sm text-emerald-700">
+          <p role="status" className="text-center text-sm text-primary">
             {t('code.resent')}
           </p>
         ) : null}

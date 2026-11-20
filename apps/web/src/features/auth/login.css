@@ -1,0 +1,121 @@
+﻿.login-spread {
+  min-height: 100dvh;
+  width: min(100%, 70rem);
+  margin: auto;
+  padding: clamp(1rem, 3.5vh, 2.5rem) clamp(1rem, 3vw, 2.5rem);
+  display: grid;
+  align-content: center;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+}
+.login-story,
+.login-sheet {
+  min-width: 0;
+}
+.login-story {
+  display: grid;
+  align-content: space-between;
+  gap: clamp(1rem, 3vh, 2rem);
+  background: var(--color-primary);
+  color: white;
+  padding: clamp(1.5rem, 3.1vw, 3rem);
+  border-radius: 1.25rem 0 0 1.25rem;
+}
+.login-story .brand-stamp {
+  background: var(--color-secondary);
+  color: var(--color-brand-ink);
+}
+.pieces {
+  display: block;
+  width: 100%;
+  height: clamp(8rem, 24dvh, 15rem);
+  align-self: center;
+}
+.login-story-compact .pieces {
+  height: 8rem;
+  width: 70%;
+  justify-self: start;
+}
+.login-story-copy h2 {
+  max-width: 10ch;
+  font: 650 clamp(2.25rem, 3.7vw, 3.6rem)/1.03 var(--font-display);
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+.login-story-copy p {
+  max-width: 34ch;
+  margin-top: 0.8rem;
+  color: #ebeee6;
+  line-height: 1.55;
+}
+.login-sheet {
+  display: grid;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-left: 0;
+  border-radius: 0 1.25rem 1.25rem 0;
+  padding: clamp(1.5rem, 3.5vw, 3.5rem);
+}
+.login-sheet > div {
+  width: 100%;
+  max-width: 24rem;
+  margin: auto;
+}
+.login-sheet h1 {
+  font-size: clamp(1.9rem, 3vw, 2.65rem);
+  line-height: 1.1;
+}
+.login-sheet input,
+.login-sheet button[type='submit'] {
+  min-height: 3rem;
+}
+.login-sheet input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pieces .piece-west {
+    --dx: -9px;
+    animation: assemble 620ms ease-out backwards;
+  }
+  .pieces .piece-east {
+    --dx: 9px;
+    animation: assemble 620ms 45ms ease-out backwards;
+  }
+  .pieces .piece-key {
+    --dy: 7px;
+    animation: assemble 540ms 110ms ease-out backwards;
+  }
+  @keyframes assemble {
+    from {
+      transform: translate(var(--dx, 0), var(--dy, 0));
+      opacity: 0.7;
+    }
+  }
+}
+@media (max-width: 47.99rem) {
+  .login-spread {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 32rem;
+    padding: 1rem;
+  }
+  .login-story {
+    gap: 0.8rem;
+    padding: 1.2rem;
+    border-radius: 1.25rem 1.25rem 0 0;
+  }
+  .login-story-copy h2 {
+    font-size: 1.6rem;
+    max-width: none;
+  }
+  .login-story-copy p,
+  .login-story .pieces {
+    display: none;
+  }
+  .login-sheet {
+    padding: 1.5rem 1.25rem;
+    border: 1px solid var(--color-divider);
+    border-top: 0;
+    border-radius: 0 0 1.25rem 1.25rem;
+  }
+}

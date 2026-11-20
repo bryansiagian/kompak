@@ -1,7 +1,7 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
+import { LoginStory } from './login-story';
 import { TextLink } from '@/components/ui/text-link';
 
 interface AuthCardFooter {
@@ -15,29 +15,34 @@ interface AuthCardProps {
   subtitle: string;
   children: ReactNode;
   footer?: AuthCardFooter;
+  login?: boolean;
 }
 
-export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
-  const t = useTranslations('common');
-
+export function AuthCard({
+  title,
+  subtitle,
+  children,
+  footer,
+  login = false,
+}: AuthCardProps) {
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-4 py-8">
-      <p className="text-center text-2xl font-extrabold tracking-tight text-emerald-700">
-        {t('appName')}
-      </p>
-      <p className="mt-1 text-center text-sm text-stone-600">{t('tagline')}</p>
-
-      <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-stone-200">
-        <h1 className="text-xl font-bold">{title}</h1>
-        <p className="mt-1 text-sm text-stone-600">{subtitle}</p>
-        <div className="mt-5">{children}</div>
-      </div>
-
-      {footer ? (
-        <p className="mt-4 text-center text-sm text-stone-600">
-          {footer.text} <TextLink href={footer.href}>{footer.label}</TextLink>
-        </p>
-      ) : null}
+    <main className="login-spread">
+      <LoginStory compact={!login} />
+      <section className="login-sheet">
+        <div>
+          <h1 className="display-heading wrap-anywhere">{title}</h1>
+          <p className="mt-2 wrap-anywhere text-sm text-muted-foreground">
+            {subtitle}
+          </p>
+          <div className="mt-5">{children}</div>
+          {footer && (
+            <p className="mt-4 border-t border-divider pt-2 text-sm text-muted-foreground">
+              {footer.text}{' '}
+              <TextLink href={footer.href}>{footer.label}</TextLink>
+            </p>
+          )}
+        </div>
+      </section>
     </main>
   );
 }

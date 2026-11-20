@@ -23,7 +23,12 @@ import { useTranslations } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import type { AuthUser, BoardDetail } from '@kompak/shared';
+import { AppShell, PageHeader } from '@/components/ui/app-shell';
+import { SelectField } from '@/components/ui/select-field';
+import { TextField } from '@/components/ui/text-field';
+import { Button } from '@/components/ui/button';
 import { FormAlert } from '@/components/ui/form-alert';
+import { RetryButton, useLoadError } from '@/components/ui/load-error';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { TextLink } from '@/components/ui/text-link';
 import { RequireAuth } from '@/features/auth/require-auth';
@@ -35,11 +40,7 @@ import { BoardActivityButton } from './board-activity-panel';
 import { BoardFilterControls } from './board-filter-controls';
 import { EMPTY_FILTERS, filteredBoard, hasFilters } from './board-filters';
 import type { BoardFilters } from './board-filters';
-import {
-  placementOf,
-  samePlacement,
-  stepListPlacement,
-} from './board-cache';
+import { placementOf, samePlacement, stepListPlacement } from './board-cache';
 import type { Placement } from './board-cache';
 import { CardDetail } from './card-detail';
 import { CardView } from './card-item';
@@ -82,17 +83,29 @@ function BoardContent({ boardId, user }: { boardId: string; user: AuthUser }) {
   const t = useTranslations('board');
   const board = useBoard(boardId);
 
-  if (board.isPending) {
-    return <LoadingScreen />;
-  }
+  const loadError = useLoadError(board, {
+    title: t('notFoundTitle'),
+    subtitle: t('notFoundBody'),
+  });
 
-  if (board.isError) {
+  if (board.isPending || board.isError) {
+    if (!loadError) return <LoadingScreen />;
+
     return (
-      <main className="mx-auto min-h-dvh w-full max-w-md space-y-3 px-4 py-8">
-        <h1 className="text-xl font-bold">{t('notFoundTitle')}</h1>
-        <p className="text-sm text-stone-600">{t('notFoundBody')}</p>
-        <TextLink href="/">{t('backHome')}</TextLink>
-      </main>
+      <AppShell>
+        <div className="mx-auto max-w-lg space-y-3 rounded-2xl border border-divider bg-surface p-5 shadow-panel">
+          <h1 className="text-xl font-bold">{loadError.title}</h1>
+          <p role="alert" className="text-sm text-muted-foreground">
+            {loadError.subtitle}
+          </p>
+          {loadError.retry ? (
+            <div>
+              <RetryButton {...loadError.retry} />
+            </div>
+          ) : null}
+          <TextLink href="/groups">{t('backHome')}</TextLink>
+        </div>
+      </AppShell>
     );
   }
 
@@ -102,6 +115,8 @@ function BoardContent({ boardId, user }: { boardId: string; user: AuthUser }) {
 
 function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
   const t = useTranslations('board');
+  const design = useTranslations('redesign');
+  const tFilters = useTranslations('filters');
   const queryClient = useQueryClient();
   const workspace = useWorkspace(board.workspaceId);
   const members = useMembers(board.workspaceId);
@@ -113,6 +128,9 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const [dismissedLinkedCard, setDismissedLinkedCard] = useState(false);
+  const [search, setSearch] = useState('');
+  const [targetLane, setTargetLane] = useState('');
+  const laneContainer = useRef<HTMLDivElement>(null);
   const [filters, setFilters] = useState<BoardFilters>(EMPTY_FILTERS);
   // Keadaan papan sebelum drag, untuk rollback dan pembatalan.
   const snapshotRef = useRef<BoardDetail | null>(null);
@@ -136,16 +154,23 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
   const effectiveSelectedCardId = selectedCardId ?? linkedCardId;
 
   const selectedCard =
-    allCards.find((card) => card.id === effectiveSelectedCardId) ?? null;  const filtersActive = hasFilters(filters);
+    allCards.find((card) => card.id === effectiveSelectedCardId) ?? null;
+  const searchTerm = search.trim().toLocaleLowerCase('id');
+  const filtersActive = hasFilters(filters) || searchTerm.length > 0;
   const visibleBoard = useMemo(
-    () => filteredBoard(board, filters, todayIso()),
-    [board, filters],
+    () => filteredBoard(board, filters, todayIso(), searchTerm),
+    [board, filters, searchTerm],
   );
-  const visibleCount = visibleBoard.lists.reduce((sum, list) => sum + list.cards.length, 0);
+  const visibleCount = visibleBoard.lists.reduce(
+    (sum, list) => sum + list.cards.length,
+    0,
+  );
 
-    const sensors = useSensors(
+  const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
 
   const key = boardKey(board.id);
@@ -171,9 +196,15 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
 
     const translated = active.rect.current.translated;
     const placeAfter = translated
-      ? translated.top + translated.height / 2 > over.rect.top + over.rect.height / 2
+      ? translated.top + translated.height / 2 >
+        over.rect.top + over.rect.height / 2
       : false;
-    const next = applyDragOver(current, String(active.id), String(over.id), placeAfter);
+    const next = applyDragOver(
+      current,
+      String(active.id),
+      String(over.id),
+      placeAfter,
+    );
     if (next !== current) {
       queryClient.setQueryData(key, next);
     }
@@ -249,28 +280,81 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
   }
 
   return (
-    <main className="min-h-dvh px-4 py-5">
-      <TextLink href={`/groups/${board.workspaceId}`}>{t('backToGroup')}</TextLink>
-      <div className="mt-1 flex items-center justify-between gap-3">
-        <h1 className="min-w-0 break-words text-2xl font-extrabold tracking-tight">
-          {board.name}
-        </h1>
+    <AppShell wide>
+      <TextLink href={`/groups/${board.workspaceId}`}>
+        {t('backToGroup')}
+      </TextLink>
+      <PageHeader title={board.name}>
         <PresenceBar users={othersOf(realtime.presence, user.id)} />
-      </div>
-
-      <div className="mt-3">
         <BoardActivityButton boardId={board.id} />
-      </div>
+      </PageHeader>
 
-      {manager ? <LabelManager board={board} /> : null}
-      <BoardFilterControls
-        board={board}
-        members={members.data ?? []}
-        filters={filters}
-        onChange={setFilters}
-        count={visibleCount}
-        total={allCards.length}
-      />
+      <div className="mt-2 grid items-start gap-3 rounded-xl border border-divider bg-surface p-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,6fr)_minmax(12rem,3fr)_minmax(12rem,3fr)]">
+        <TextField
+          type="search"
+          label={design('boardSearch')}
+          placeholder={design('boardSearchPlaceholder')}
+          value={search}
+          onChange={(event) => setSearch(event.currentTarget.value)}
+        />
+        {board.lists.length ? (
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
+            <SelectField
+              label={design('columnJump')}
+              value={
+                board.lists.some((list) => list.id === targetLane)
+                  ? targetLane
+                  : ''
+              }
+              onChange={(event) => setTargetLane(event.currentTarget.value)}
+              options={[
+                { value: '', label: design('columnSelect') },
+                ...board.lists.map((list) => ({
+                  value: list.id,
+                  label: list.name,
+                })),
+              ]}
+            />
+            <Button
+              variant="secondary"
+              disabled={!board.lists.some((list) => list.id === targetLane)}
+              onClick={() => {
+                const lane = document.getElementById(`lane-${targetLane}`);
+                if (!lane || !laneContainer.current?.contains(lane)) return;
+                lane.scrollIntoView({ block: 'nearest', inline: 'start' });
+                lane.focus({ preventScroll: true });
+              }}
+            >
+              {design('columnGo')}
+            </Button>
+          </div>
+        ) : null}
+        <details className="rounded-lg bg-brand-tint sm:col-span-2 lg:col-span-1 lg:mt-6">
+          <summary className="control-focus min-h-11 cursor-pointer rounded-xl px-3 py-3 text-sm font-semibold">
+            {design('boardTools')}
+          </summary>
+          <div className="px-3 pb-3">
+            <BoardFilterControls
+              board={board}
+              members={members.data ?? []}
+              filters={filters}
+              onChange={setFilters}
+            />
+            {manager ? <LabelManager board={board} /> : null}
+          </div>
+        </details>
+        {filtersActive ? (
+          <p
+            role="status"
+            className="text-sm text-muted-foreground lg:col-span-2"
+          >
+            {tFilters('showing', {
+              count: visibleCount,
+              total: allCards.length,
+            })}
+          </p>
+        ) : null}
+      </div>
       <ConnectionBanner status={realtime.status} />
 
       {moveFailed ? (
@@ -296,7 +380,13 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
           screenReaderInstructions: { draggable: t('dnd.instructions') },
         }}
       >
-        <div className="-mx-4 mt-4 flex items-start gap-3 overflow-x-auto px-4 pb-6">
+        <div
+          ref={laneContainer}
+          role="region"
+          aria-label={design('boardLayout')}
+          tabIndex={0}
+          className="control-focus mt-5 flex min-w-0 items-start gap-3 overflow-x-auto pb-5 pt-1 sm:gap-4"
+        >
           {visibleBoard.lists.map((list, index) => (
             <ListColumn
               key={list.id}
@@ -308,7 +398,10 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
               canMoveLeft={index > 0}
               canMoveRight={index < board.lists.length - 1}
               assigneeNameOf={assigneeNameOf}
-              onOpenCard={setSelectedCardId}
+              onOpenCard={(cardId) => {
+                moveCard.reset();
+                setSelectedCardId(cardId);
+              }}
               onMoveList={(direction) => handleMoveList(list.id, direction)}
             />
           ))}
@@ -335,6 +428,8 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
           card={selectedCard}
           members={members.data ?? []}
           viewer={{ userId: user.id, role }}
+          movePending={moveCard.isPending}
+          moveFailed={moveCard.isError}
           onMove={(placement) => handleMoveCard(selectedCard.id, placement)}
           onClose={() => {
             setSelectedCardId(null);
@@ -342,6 +437,6 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
           }}
         />
       ) : null}
-    </main>
+    </AppShell>
   );
 }

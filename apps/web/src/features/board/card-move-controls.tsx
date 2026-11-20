@@ -10,11 +10,17 @@ import type { Placement } from './board-cache';
 interface CardMoveControlsProps {
   board: BoardDetail;
   card: Card;
+  disabled?: boolean;
   onMove: (placement: Placement) => void;
 }
 
 // Alternatif tanpa drag: ramah layar sentuh dan pembaca layar.
-export function CardMoveControls({ board, card, onMove }: CardMoveControlsProps) {
+export function CardMoveControls({
+  board,
+  card,
+  onMove,
+  disabled,
+}: CardMoveControlsProps) {
   const t = useTranslations('board.move');
   const up = stepPlacement(board, card.id, 'up');
   const down = stepPlacement(board, card.id, 'down');
@@ -27,19 +33,23 @@ export function CardMoveControls({ board, card, onMove }: CardMoveControlsProps)
       <SelectField
         label={t('toList')}
         value={card.listId}
+        disabled={disabled}
         onChange={(event) => {
           const listId = event.target.value;
           if (listId !== card.listId) {
             onMove({ listId, beforeCardId: null });
           }
         }}
-        options={board.lists.map((list) => ({ value: list.id, label: list.name }))}
+        options={board.lists.map((list) => ({
+          value: list.id,
+          label: list.name,
+        }))}
       />
       <div className="flex gap-2">
         <Button
           variant="secondary"
           fullWidth
-          disabled={!up}
+          disabled={disabled || !up}
           onClick={() => {
             if (up) onMove(up);
           }}
@@ -49,7 +59,7 @@ export function CardMoveControls({ board, card, onMove }: CardMoveControlsProps)
         <Button
           variant="secondary"
           fullWidth
-          disabled={!down}
+          disabled={disabled || !down}
           onClick={() => {
             if (down) onMove(down);
           }}

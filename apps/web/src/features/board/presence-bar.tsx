@@ -8,7 +8,7 @@ const MAX_AVATARS = 4;
 
 // Nama kelas ditulis utuh agar terdeteksi Tailwind.
 const AVATAR_COLORS = [
-  'bg-emerald-200 text-emerald-900',
+  'bg-brand-tint text-brand-ink',
   'bg-amber-200 text-amber-900',
   'bg-sky-200 text-sky-900',
   'bg-rose-200 text-rose-900',

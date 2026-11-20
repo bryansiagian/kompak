@@ -54,14 +54,17 @@ function BoardActivityPanel({
       ref={dialogRef}
       onClose={onClose}
       aria-labelledby={headingId}
-      className="fixed inset-x-0 bottom-0 m-0 max-h-[92dvh] w-full max-w-none overflow-y-auto rounded-t-2xl bg-white p-0 text-stone-900 shadow-xl backdrop:bg-black/40 sm:inset-0 sm:m-auto sm:h-fit sm:max-w-md sm:rounded-2xl"
+      className="fixed inset-x-0 bottom-0 m-0 max-h-[92dvh] w-full max-w-none overflow-y-auto rounded-t-3xl bg-surface p-0 text-foreground shadow-xl backdrop:bg-brand-ink/55 sm:inset-0 sm:m-auto sm:h-fit sm:max-w-lg sm:rounded-3xl"
     >
       <div className="space-y-4 p-5">
-        <header className="flex items-center justify-between gap-3">
+        <header className="flex items-center justify-between gap-3 border-b border-divider pb-3">
           <h2 id={headingId} className="text-lg font-bold">
             {t('boardTitle')}
           </h2>
-          <Button variant="secondary" onClick={() => dialogRef.current?.close()}>
+          <Button
+            variant="secondary"
+            onClick={() => dialogRef.current?.close()}
+          >
             {t('close')}
           </Button>
         </header>

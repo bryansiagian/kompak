@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
@@ -19,7 +20,9 @@ export function CardAiAssistant({ card }: Props) {
   const t = useTranslations('ai');
   const queryClient = useQueryClient();
   const subtasks = useMutation({ mutationFn: () => generateSubtasks(card.id) });
-  const summary = useMutation({ mutationFn: () => summarizeDiscussion(card.id) });
+  const summary = useMutation({
+    mutationFn: () => summarizeDiscussion(card.id),
+  });
   const [checked, setChecked] = useState<number[]>([]);
   const [createdIndexes, setCreatedIndexes] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
@@ -39,9 +42,11 @@ export function CardAiAssistant({ card }: Props) {
   }
 
   function toggle(index: number) {
-    setChecked((current) => current.includes(index)
-      ? current.filter((value) => value !== index)
-      : [...current, index]);
+    setChecked((current) =>
+      current.includes(index)
+        ? current.filter((value) => value !== index)
+        : [...current, index],
+    );
   }
 
   async function accept(items: AiSubtask[]) {
@@ -59,14 +64,18 @@ export function CardAiAssistant({ card }: Props) {
           createdId = created.id;
           createdIdRef.current[index] = createdId;
           // Write to cache immediately: mutations in this component are direct API calls.
-          queryClient.setQueryData<BoardDetail>(boardKey(card.boardId), (board) =>
-            board ? addCardToBoard(board, created) : board,
+          queryClient.setQueryData<BoardDetail>(
+            boardKey(card.boardId),
+            (board) => (board ? addCardToBoard(board, created) : board),
           );
         }
         if (input.description) {
-          const updated = await updateCard(createdId, { description: input.description });
-          queryClient.setQueryData<BoardDetail>(boardKey(card.boardId), (board) =>
-            board ? replaceCardInBoard(board, updated) : board,
+          const updated = await updateCard(createdId, {
+            description: input.description,
+          });
+          queryClient.setQueryData<BoardDetail>(
+            boardKey(card.boardId),
+            (board) => (board ? replaceCardInBoard(board, updated) : board),
           );
         }
         done.add(index);
@@ -81,19 +90,32 @@ export function CardAiAssistant({ card }: Props) {
   }
 
   return (
-    <section aria-label={t('title')} className="space-y-3 rounded-xl border border-emerald-200 bg-emerald-50/40 p-3">
+    <section
+      aria-label={t('title')}
+      className="space-y-3 rounded-xl border border-divider bg-brand-tint p-3"
+    >
       <h3 className="font-semibold">{t('title')}</h3>
       <p className="text-xs text-stone-600">{t('disclaimer')}</p>
       <div className="flex flex-wrap gap-2">
-        <button type="button" className="min-h-11 rounded-lg border bg-white px-3 text-sm font-medium disabled:opacity-50" onClick={generate} disabled={subtasks.isPending || saving}>
+        <Button
+          variant="secondary"
+          onClick={generate}
+          disabled={subtasks.isPending || saving}
+        >
           {subtasks.isPending ? t('loading') : t('generate')}
-        </button>
-        <button type="button" className="min-h-11 rounded-lg border bg-white px-3 text-sm font-medium disabled:opacity-50" onClick={() => summary.mutate()} disabled={summary.isPending || saving}>
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => summary.mutate()}
+          disabled={summary.isPending || saving}
+        >
           {summary.isPending ? t('loading') : t('summarize')}
-        </button>
+        </Button>
       </div>
-      {(subtasks.isError || summary.isError) ? (
-        <p role="alert" className="text-sm text-rose-700">{t('requestFailed')}</p>
+      {subtasks.isError || summary.isError ? (
+        <p role="alert" className="text-sm text-rose-700">
+          {t('requestFailed')}
+        </p>
       ) : null}
       {subtasks.data ? (
         <div className="space-y-2">
@@ -102,30 +124,75 @@ export function CardAiAssistant({ card }: Props) {
             {subtasks.data.subtasks.map((item, index) => (
               <li key={`${index}:${item.title}`}>
                 <label className="flex min-h-11 items-start gap-2 rounded-lg bg-white p-2 text-sm">
-                  <input type="checkbox" className="mt-1" checked={checked.includes(index) || createdIndexes.includes(index)} disabled={saving || createdIndexes.includes(index)} onChange={() => toggle(index)} />
-                  <span>
+                  <input
+                    type="checkbox"
+                    className="mt-1"
+                    checked={
+                      checked.includes(index) || createdIndexes.includes(index)
+                    }
+                    disabled={saving || createdIndexes.includes(index)}
+                    onChange={() => toggle(index)}
+                  />
+                  <span className="min-w-0 wrap-anywhere">
                     <strong className="block">{item.title}</strong>
                     <span className="text-stone-600">{item.description}</span>
-                    {createdIndexes.includes(index) ? <span className="block text-emerald-700">{t('created')}</span> : null}
+                    {createdIndexes.includes(index) ? (
+                      <span className="block text-primary">
+                        {t('created')}
+                      </span>
+                    ) : null}
                   </span>
                 </label>
               </li>
             ))}
           </ul>
-          {saveError ? <p role="alert" className="text-sm text-rose-700">{t('saveFailed')}</p> : null}
-          <button type="button" className="min-h-11 rounded-lg bg-emerald-700 px-3 text-sm font-semibold text-white disabled:opacity-50" disabled={saving || checked.every((index) => createdIndexes.includes(index))} onClick={() => void accept(subtasks.data.subtasks)}>
+          {saveError ? (
+            <p role="alert" className="text-sm text-rose-700">
+              {t('saveFailed')}
+            </p>
+          ) : null}
+          <Button
+            disabled={
+              saving || checked.every((index) => createdIndexes.includes(index))
+            }
+            onClick={() => void accept(subtasks.data.subtasks)}
+          >
             {saving ? t('saving') : t('accept')}
-          </button>
+          </Button>
         </div>
       ) : null}
       {summary.data ? (
-        <div className="space-y-2 rounded-lg bg-white p-3 text-sm">
+        <div className="wrap-anywhere space-y-2 rounded-lg bg-surface p-3 text-sm">
           <h4 className="font-semibold">{t('summaryTitle')}</h4>
-          <p className="whitespace-pre-wrap">{summary.data.summary}</p>
+          <p className="wrap-anywhere whitespace-pre-wrap">
+            {summary.data.summary}
+          </p>
           <h5 className="font-medium">{t('keyPoints')}</h5>
-          <ul className="list-disc space-y-1 pl-5">{summary.data.keyPoints.map((item, index) => <li key={index}>{item}</li>)}</ul>
-          {summary.data.decisions.length > 0 ? <><h5 className="font-medium">{t('decisions')}</h5><ul className="list-disc space-y-1 pl-5">{summary.data.decisions.map((item, index) => <li key={index}>{item}</li>)}</ul></> : null}
-          {summary.data.actionItems.length > 0 ? <><h5 className="font-medium">{t('actionItems')}</h5><ul className="list-disc space-y-1 pl-5">{summary.data.actionItems.map((item, index) => <li key={index}>{item}</li>)}</ul></> : null}
+          <ul className="list-disc space-y-1 pl-5">
+            {summary.data.keyPoints.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+          {summary.data.decisions.length > 0 ? (
+            <>
+              <h5 className="font-medium">{t('decisions')}</h5>
+              <ul className="list-disc space-y-1 pl-5">
+                {summary.data.decisions.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+          {summary.data.actionItems.length > 0 ? (
+            <>
+              <h5 className="font-medium">{t('actionItems')}</h5>
+              <ul className="list-disc space-y-1 pl-5">
+                {summary.data.actionItems.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
         </div>
       ) : null}
     </section>

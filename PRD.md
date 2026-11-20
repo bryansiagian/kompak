@@ -104,6 +104,7 @@ Priority: **P0** = MVP must-have, **P1** = should-have, **P2** = nice-to-have.
 
 - Labels belong to a board: a name (up to 30 characters) and a color from a fixed palette, up to 30 labels per board. OWNER and ADMIN manage them; any member attaches labels to cards (up to 10 per card). Deleting a label removes it from every card.
 - Filter the board by assignee, label, and due date (overdue, today, this week). Filtering runs in the browser on the data already loaded.
+- Search within an open project filters its loaded cards by title or description and combines with the active filters.
 - Text search across the cards of a workspace (title and description, case-insensitive, at least 2 characters), most recently updated first. Only members of the workspace can search it.
 
 ### 4.7 AI Features (P1)
