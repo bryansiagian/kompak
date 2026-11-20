@@ -160,6 +160,10 @@
     "save": "Simpan"
   },
   "auth": {
+    "story": {
+      "heading": "Beda peran. Satu tujuan.",
+      "body": "Setiap anggota membawa keahlian sendiri. Di Kompak, kalian menyatukannya."
+    },
     "login": {
       "title": "Masuk ke Kompak",
       "subtitle": "Lanjutkan tugas kelompokmu.",

@@ -1,8 +1,7 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
-import { Brand } from '@/components/ui/app-shell';
+import { LoginStory } from './login-story';
 import { TextLink } from '@/components/ui/text-link';
 
 interface AuthCardFooter {
@@ -16,51 +15,34 @@ interface AuthCardProps {
   subtitle: string;
   children: ReactNode;
   footer?: AuthCardFooter;
+  login?: boolean;
 }
 
-export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
-  const t = useTranslations('common');
-  const design = useTranslations('redesign');
-
+export function AuthCard({
+  title,
+  subtitle,
+  children,
+  footer,
+  login = false,
+}: AuthCardProps) {
   return (
-    <main className="mx-auto grid min-h-dvh w-full max-w-6xl content-center gap-3 px-4 py-8 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-stretch lg:gap-4">
-      <aside className="auth-jacket relative isolate overflow-hidden rounded-3xl bg-brand-ink p-5 text-white sm:p-8 lg:flex lg:flex-col lg:justify-between lg:rounded-3xl lg:p-10">
-        <Brand />
-        <div aria-hidden="true" className="auth-symbol hidden">
-          <i />
-          <i />
-          <i />
-        </div>
-        <div className="hidden lg:block">
-          <p className="display-heading hidden max-w-sm lg:block">
-            {design('authHeading')}
+    <main className="login-spread">
+      <LoginStory compact={!login} />
+      <section className="login-sheet">
+        <div>
+          <h1 className="display-heading wrap-anywhere">{title}</h1>
+          <p className="mt-2 wrap-anywhere text-sm text-muted-foreground">
+            {subtitle}
           </p>
-          <p className="sr-only">{t('tagline')}</p>
-        </div>
-        <ul className="mt-10 hidden space-y-3 text-sm font-semibold lg:block">
-          {[design('authGroups'), design('authTasks'), design('authShare')].map(
-            (item) => (
-              <li key={item} className="flex items-center gap-3">
-                <span
-                  aria-hidden="true"
-                  className="size-2 rounded-full bg-brand-tint"
-                />
-                {item}
-              </li>
-            ),
+          <div className="mt-5">{children}</div>
+          {footer && (
+            <p className="mt-4 border-t border-divider pt-2 text-sm text-muted-foreground">
+              {footer.text}{' '}
+              <TextLink href={footer.href}>{footer.label}</TextLink>
+            </p>
           )}
-        </ul>
-      </aside>
-      <div className="rounded-3xl border border-divider bg-surface p-5 shadow-panel sm:p-8 lg:rounded-3xl lg:p-12">
-        <h1 className="display-heading wrap-anywhere">{title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
-        <div className="mt-6">{children}</div>
-        {footer ? (
-          <p className="mt-5 border-t border-divider pt-3 text-sm text-muted-foreground">
-            {footer.text} <TextLink href={footer.href}>{footer.label}</TextLink>
-          </p>
-        ) : null}
-      </div>
+        </div>
+      </section>
     </main>
   );
 }

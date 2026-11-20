@@ -55,6 +55,7 @@ export function LoginForm() {
   return (
     <GuestOnly>
       <AuthCard
+        login
         title={t('login.title')}
         subtitle={t('login.subtitle')}
         footer={{
