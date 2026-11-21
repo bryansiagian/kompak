@@ -43,17 +43,23 @@ export function CardView({
 
   return (
     <div
-      className={`task-slip flex items-stretch rounded-lg border border-divider bg-surface ${
+      className={`task-slip flex items-stretch rounded-xl border border-divider bg-surface transition-colors duration-150 hover:border-primary/60 focus-within:border-primary ${
         overlay ? 'drag-preview' : 'shadow-panel'
       }`}
     >
-      {handle}
       <button
         type="button"
         onClick={onOpen}
         className="min-h-11 min-w-0 flex-1 rounded-xl p-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
-        <span className="block wrap-anywhere font-semibold">{card.title}</span>
+        <span className="block wrap-anywhere font-semibold leading-snug">
+          {card.title}
+        </span>
+        {card.description.trim() && (
+          <span className="mt-1 line-clamp-2 wrap-anywhere text-sm text-muted-foreground">
+            {card.description}
+          </span>
+        )}
         {card.labelIds.length > 0 ? (
           <span className="mt-1.5 flex flex-wrap gap-1">
             {labels
@@ -78,11 +84,14 @@ export function CardView({
               </span>
             ) : null}
             {assigneeName ? (
-              <span className="text-stone-600">{assigneeName}</span>
+              <span className="wrap-anywhere text-muted-foreground">
+                {assigneeName}
+              </span>
             ) : null}
           </span>
         ) : null}
       </button>
+      {handle}
     </div>
   );
 }
@@ -146,7 +155,7 @@ export function SortableCard({
             type="button"
             ref={setActivatorNodeRef}
             aria-label={t('drag', { title: card.title })}
-            className="flex min-h-11 w-11 shrink-0 touch-none items-center justify-center rounded-l-xl text-muted-foreground hover:bg-brand-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="flex min-h-11 w-11 shrink-0 touch-none items-center justify-center cursor-grab rounded-r-xl active:cursor-grabbing text-muted-foreground hover:bg-brand-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             {...attributes}
             {...listeners}
           >
