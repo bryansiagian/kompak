@@ -135,29 +135,7 @@ export function CardDetail({
 
       <div className="grid items-start gap-4 p-4 sm:p-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <div className="min-w-0 space-y-4">
-          <div className="rounded-2xl border border-divider bg-brand-tint p-4">
-            <CardMoveControls
-              board={board}
-              card={card}
-              onMove={onMove}
-              disabled={movePending}
-            />
-            {movePending ? (
-              <p role="status" className="mt-3 text-sm">
-                {design('moving')}
-              </p>
-            ) : null}
-            {moveFailed ? (
-              <div className="mt-3">
-                <FormAlert>{design('moveFailed')}</FormAlert>
-              </div>
-            ) : null}
-          </div>
-          <form
-            onSubmit={handleSubmit}
-            noValidate
-            className="space-y-4 border-t border-divider pt-4"
-          >
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <h3 className="font-bold">{design('taskDetails')}</h3>
             <TextField
               name="title"
@@ -199,6 +177,24 @@ export function CardDetail({
               {update.isPending ? t('saving') : t('save')}
             </Button>
           </form>
+          <div className="rounded-2xl border border-divider bg-brand-tint p-4">
+            <CardMoveControls
+              board={board}
+              card={card}
+              onMove={onMove}
+              disabled={movePending}
+            />
+            {movePending ? (
+              <p role="status" className="mt-3 text-sm">
+                {design('moving')}
+              </p>
+            ) : null}
+            {moveFailed ? (
+              <div className="mt-3">
+                <FormAlert>{design('moveFailed')}</FormAlert>
+              </div>
+            ) : null}
+          </div>
 
           {canDeleteCard(viewer, card) ? (
             <details className="rounded-xl border border-divider">
