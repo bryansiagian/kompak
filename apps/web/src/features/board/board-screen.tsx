@@ -23,9 +23,8 @@ import { useTranslations } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import type { AuthUser, BoardDetail } from '@kompak/shared';
-import { AppShell, PageHeader } from '@/components/ui/app-shell';
+import { AppShell } from '@/components/ui/app-shell';
 import { SelectField } from '@/components/ui/select-field';
-import { TextField } from '@/components/ui/text-field';
 import { Button } from '@/components/ui/button';
 import { FormAlert } from '@/components/ui/form-alert';
 import { RetryButton, useLoadError } from '@/components/ui/load-error';
@@ -38,7 +37,7 @@ import { AccessLost } from './access-lost';
 import { AddListForm } from './add-list-form';
 import { BoardActivityButton } from './board-activity-panel';
 import { BoardFilterControls } from './board-filter-controls';
-import { EMPTY_FILTERS, filteredBoard, hasFilters } from './board-filters';
+import { EMPTY_FILTERS, filteredBoard } from './board-filters';
 import type { BoardFilters } from './board-filters';
 import { placementOf, samePlacement, stepListPlacement } from './board-cache';
 import type { Placement } from './board-cache';
@@ -52,6 +51,7 @@ import {
   targetListName,
 } from './dnd-helpers';
 import { boardKey, useBoard, useMoveCard, useMoveList } from './hooks';
+import { QuickAddCard } from './quick-add-card';
 import { ListColumn } from './list-column';
 import { LabelManager } from './label-manager';
 import { todayIso } from './due-date';
@@ -129,7 +129,7 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
   const searchParams = useSearchParams();
   const [dismissedLinkedCard, setDismissedLinkedCard] = useState(false);
   const [search, setSearch] = useState('');
-  const [targetLane, setTargetLane] = useState('');
+
   const laneContainer = useRef<HTMLDivElement>(null);
   const [filters, setFilters] = useState<BoardFilters>(EMPTY_FILTERS);
   // Keadaan papan sebelum drag, untuk rollback dan pembatalan.
@@ -156,7 +156,11 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
   const selectedCard =
     allCards.find((card) => card.id === effectiveSelectedCardId) ?? null;
   const searchTerm = search.trim().toLocaleLowerCase('id');
-  const filtersActive = hasFilters(filters) || searchTerm.length > 0;
+  const filterCount =
+    Number(Boolean(filters.assigneeId)) +
+    Number(Boolean(filters.labelId)) +
+    Number(filters.due !== 'all');
+  const filtersActive = filterCount > 0 || searchTerm.length > 0;
   const visibleBoard = useMemo(
     () => filteredBoard(board, filters, todayIso(), searchTerm),
     [board, filters, searchTerm],
@@ -281,32 +285,78 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
 
   return (
     <AppShell wide>
-      <TextLink href={`/groups/${board.workspaceId}`}>
-        {t('backToGroup')}
-      </TextLink>
-      <PageHeader title={board.name}>
-        <PresenceBar users={othersOf(realtime.presence, user.id)} />
-        <BoardActivityButton boardId={board.id} />
-      </PageHeader>
-
-      <div className="mt-2 grid items-start gap-3 rounded-xl border border-divider bg-surface p-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,6fr)_minmax(12rem,3fr)_minmax(12rem,3fr)]">
-        <TextField
-          type="search"
-          label={design('boardSearch')}
-          placeholder={design('boardSearchPlaceholder')}
-          value={search}
-          onChange={(event) => setSearch(event.currentTarget.value)}
-        />
-        {board.lists.length ? (
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
+      <header className="space-y-1 border-b border-divider pb-3">
+        <nav
+          aria-label={design('navigation')}
+          className="flex items-center gap-2 text-sm text-muted-foreground"
+        >
+          <TextLink href={`/groups/${board.workspaceId}`}>
+            {workspace.data?.name ?? t('backToGroup')}
+          </TextLink>
+          <span aria-hidden="true">/</span>
+          <span>{t('pageTitle')}</span>
+        </nav>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="wrap-anywhere font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              {board.name}
+            </h1>
+            <PresenceBar users={othersOf(realtime.presence, user.id)} />
+          </div>
+          <div className="flex max-w-full flex-wrap items-start gap-2">
+            <BoardActivityButton boardId={board.id} />
+            <QuickAddCard
+              boardId={board.id}
+              listId={board.lists[0]?.id ?? ''}
+              destinations={board.lists}
+            />
+          </div>
+        </div>
+      </header>
+      <div className="flex flex-wrap items-end gap-x-3 gap-y-1 border-b border-divider py-2">
+        <label className="min-w-0 flex-[1_1_13rem] sm:max-w-sm">
+          <span className="sr-only">{design('boardSearch')}</span>
+          <input
+            type="search"
+            className="field-control border-divider"
+            placeholder={design('boardSearchPlaceholder')}
+            value={search}
+            onChange={(event) => setSearch(event.currentTarget.value)}
+          />
+        </label>
+        <details className="group min-w-0 open:order-last open:w-full">
+          <summary className="control-focus min-h-11 cursor-pointer rounded-lg px-3 py-3 text-sm font-semibold hover:bg-brand-tint">
+            {design('boardTools')}
+            {filterCount > 0 && (
+              <span className="ml-2 rounded-full bg-primary px-2 py-1 text-xs text-white">
+                {filterCount}
+              </span>
+            )}
+          </summary>
+          <div className="rounded-xl border border-divider p-2">
+            <BoardFilterControls
+              board={board}
+              members={members.data ?? []}
+              filters={filters}
+              onChange={setFilters}
+            />
+            {manager && <LabelManager board={board} />}
+          </div>
+        </details>
+        {board.lists.length > 0 && (
+          <div className="w-full sm:w-auto lg:hidden">
             <SelectField
               label={design('columnJump')}
-              value={
-                board.lists.some((list) => list.id === targetLane)
-                  ? targetLane
-                  : ''
-              }
-              onChange={(event) => setTargetLane(event.currentTarget.value)}
+              value=""
+              onChange={(event) => {
+                const lane = document.getElementById(
+                  `lane-${event.currentTarget.value}`,
+                );
+                if (lane && laneContainer.current?.contains(lane)) {
+                  lane.scrollIntoView({ block: 'nearest', inline: 'start' });
+                  lane.focus({ preventScroll: true });
+                }
+              }}
               options={[
                 { value: '', label: design('columnSelect') },
                 ...board.lists.map((list) => ({
@@ -315,45 +365,30 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
                 })),
               ]}
             />
+          </div>
+        )}
+        {filtersActive && (
+          <>
+            <p
+              role="status"
+              className="self-center text-sm text-muted-foreground"
+            >
+              {tFilters('showing', {
+                count: visibleCount,
+                total: allCards.length,
+              })}
+            </p>
             <Button
               variant="secondary"
-              disabled={!board.lists.some((list) => list.id === targetLane)}
               onClick={() => {
-                const lane = document.getElementById(`lane-${targetLane}`);
-                if (!lane || !laneContainer.current?.contains(lane)) return;
-                lane.scrollIntoView({ block: 'nearest', inline: 'start' });
-                lane.focus({ preventScroll: true });
+                setFilters(EMPTY_FILTERS);
+                setSearch('');
               }}
             >
-              {design('columnGo')}
+              {tFilters('clear')}
             </Button>
-          </div>
-        ) : null}
-        <details className="rounded-lg bg-brand-tint sm:col-span-2 lg:col-span-1 lg:mt-6">
-          <summary className="control-focus min-h-11 cursor-pointer rounded-xl px-3 py-3 text-sm font-semibold">
-            {design('boardTools')}
-          </summary>
-          <div className="px-3 pb-3">
-            <BoardFilterControls
-              board={board}
-              members={members.data ?? []}
-              filters={filters}
-              onChange={setFilters}
-            />
-            {manager ? <LabelManager board={board} /> : null}
-          </div>
-        </details>
-        {filtersActive ? (
-          <p
-            role="status"
-            className="text-sm text-muted-foreground lg:col-span-2"
-          >
-            {tFilters('showing', {
-              count: visibleCount,
-              total: allCards.length,
-            })}
-          </p>
-        ) : null}
+          </>
+        )}
       </div>
       <ConnectionBanner status={realtime.status} />
 
@@ -385,7 +420,7 @@ function BoardView({ board, user }: { board: BoardDetail; user: AuthUser }) {
           role="region"
           aria-label={design('boardLayout')}
           tabIndex={0}
-          className="control-focus mt-5 flex min-w-0 items-start gap-3 overflow-x-auto pb-5 pt-1 sm:gap-4"
+          className="control-focus mt-2 flex min-w-0 items-start gap-3 overflow-x-auto pb-5 pt-1 sm:gap-4"
         >
           {visibleBoard.lists.map((list, index) => (
             <ListColumn
