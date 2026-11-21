@@ -90,25 +90,30 @@ export function ListHeader({
       <div className="flex items-center justify-between gap-2">
         <h2 className="min-w-0 break-words font-bold">
           {list.name}{' '}
-          <span className="text-sm font-normal text-stone-500">
-            · {t('cardCount', { count: list.cards.length })}
+          <span className="inline-block rounded-full bg-surface px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            {t('cardCount', { count: list.cards.length })}
           </span>
         </h2>
         {canManage ? (
-          <Button
-            variant="secondary"
+          <button
+            type="button"
+            className="control-focus size-11 shrink-0 rounded-lg hover:bg-brand-tint"
             aria-label={t('list.menu', { name: list.name })}
             aria-expanded={mode === 'menu'}
             onClick={() => setMode(mode === 'menu' ? 'idle' : 'menu')}
           >
             ⋯
-          </Button>
+          </button>
         ) : null}
       </div>
 
       {mode === 'menu' ? (
         <div className="space-y-2 rounded-xl bg-white p-3 ring-1 ring-stone-200">
-          <Button variant="secondary" fullWidth onClick={() => setMode('rename')}>
+          <Button
+            variant="secondary"
+            fullWidth
+            onClick={() => setMode('rename')}
+          >
             {t('list.rename')}
           </Button>
           <div className="flex gap-2">
@@ -139,7 +144,9 @@ export function ListHeader({
         </div>
       ) : null}
 
-      {error ? <FormAlert>{tErrors(workspaceErrorKey(error))}</FormAlert> : null}
+      {error ? (
+        <FormAlert>{tErrors(workspaceErrorKey(error))}</FormAlert>
+      ) : null}
     </div>
   );
 }

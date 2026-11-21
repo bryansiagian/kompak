@@ -39,7 +39,7 @@ export function AddListForm({ boardId }: { boardId: string }) {
   }
 
   return (
-    <div className="w-[calc(100vw-4.5rem)] max-w-80 shrink-0 rounded-xl border border-dashed border-control-border/50 bg-surface p-3 sm:w-76">
+    <div className="w-[calc(100vw-4.5rem)] max-w-80 shrink-0 rounded-xl border border-dashed border-control-border/50 bg-board-lane p-2 sm:w-80">
       {open ? (
         <form onSubmit={handleSubmit} noValidate className="space-y-2">
           <TextField
@@ -62,9 +62,13 @@ export function AddListForm({ boardId }: { boardId: string }) {
           </div>
         </form>
       ) : (
-        <Button variant="secondary" fullWidth onClick={() => setOpen(true)}>
+        <button
+          type="button"
+          className="control-focus min-h-11 w-full rounded-lg px-2 text-left text-sm font-semibold text-primary hover:bg-brand-tint"
+          onClick={() => setOpen(true)}
+        >
           + {t('addOpen')}
-        </Button>
+        </button>
       )}
     </div>
   );
