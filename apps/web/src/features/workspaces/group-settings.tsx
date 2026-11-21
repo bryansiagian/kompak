@@ -8,6 +8,7 @@ import { updateWorkspaceSchema } from '@kompak/shared';
 import type { WorkspaceDetail } from '@kompak/shared';
 import { Button } from '@/components/ui/button';
 import { ConfirmAction } from '@/components/ui/confirm-action';
+import { DestructiveConfirmDialog } from '@/components/ui/destructive-confirm-dialog';
 import { FormAlert } from '@/components/ui/form-alert';
 import { TextField } from '@/components/ui/text-field';
 import { workspaceErrorKey } from './errors';
@@ -32,64 +33,72 @@ export function GroupSettings({
   const rename = useRenameWorkspace();
   const remove = useDeleteWorkspace();
   const leave = useLeaveWorkspace();
-  const [nameError, setNameError] = useState<string | undefined>();
+  const [draft, setDraft] = useState<string | null>(null);
+  const name = draft ?? workspace.name;
+  const parsed = updateWorkspaceSchema.safeParse({ name });
+  const canSave =
+    parsed.success &&
+    name.trim() !== workspace.name.trim() &&
+    !rename.isPending;
 
   function handleRename(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const parsed = updateWorkspaceSchema.safeParse({
-      name: new FormData(event.currentTarget).get('name'),
-    });
-    if (!parsed.success) {
-      setNameError(t('settings.nameRequired'));
-      return;
-    }
-
-    setNameError(undefined);
-    rename.mutate({ workspaceId: workspace.id, input: parsed.data });
+    if (!canSave || !parsed.success) return;
+    rename.mutate(
+      { workspaceId: workspace.id, input: parsed.data },
+      {
+        onSuccess: () => setDraft(null),
+      },
+    );
   }
 
   const error = rename.isError
     ? rename.error
-    : remove.isError
-      ? remove.error
-      : leave.isError
-        ? leave.error
-        : null;
+    : leave.isError
+      ? leave.error
+      : null;
 
   return (
     <>
       <div className="space-y-4">
         {canManage(workspace.role) ? (
           <form
-            key={workspace.name}
             onSubmit={handleRename}
             noValidate
-            className="space-y-3"
+            className="space-y-3 [&_button:disabled]:bg-surface-muted [&_button:disabled]:text-muted-foreground [&_button:disabled]:opacity-100"
           >
             <TextField
               name="name"
               label={t('settings.name')}
-              defaultValue={workspace.name}
+              value={name}
+              onChange={(event) => setDraft(event.currentTarget.value)}
+              readOnly={rename.isPending}
               autoComplete="off"
-              error={nameError}
+              error={
+                draft !== null && !parsed.success
+                  ? t('settings.nameRequired')
+                  : undefined
+              }
             />
-            <Button type="submit" fullWidth disabled={rename.isPending}>
+            <Button type="submit" fullWidth disabled={!canSave}>
               {rename.isPending ? t('settings.saving') : t('settings.save')}
             </Button>
           </form>
         ) : null}
 
         {workspace.role === 'OWNER' ? (
-          <ConfirmAction
+          <DestructiveConfirmDialog
             label={t('settings.delete')}
-            prompt={t('settings.deletePrompt')}
-            confirmLabel={t('settings.deleteConfirm')}
-            disabled={remove.isPending}
-            onConfirm={() =>
-              remove.mutate(workspace.id, {
-                onSuccess: () => router.replace('/groups'),
-              })
-            }
+            title={t('settings.deleteTitle', { name: workspace.name })}
+            description={t('settings.deleteBody')}
+            exactName={workspace.name}
+            confirmLabel={t('settings.delete')}
+            pendingLabel={t('settings.deleting')}
+            describeError={(cause) => t(`errors.${workspaceErrorKey(cause)}`)}
+            onConfirm={async () => {
+              await remove.mutateAsync(workspace.id);
+              router.replace('/groups');
+            }}
           />
         ) : (
           <ConfirmAction
