@@ -6,11 +6,19 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { EmptyState } from '@/components/ui/collection-state';
 import { FormAlert } from '@/components/ui/form-alert';
-import { TextField } from '@/components/ui/text-field';
+import type { ReactNode } from 'react';
+import { useId } from 'react';
 import { searchCards } from '@/lib/api/search';
 
-export function WorkspaceSearch({ workspaceId }: { workspaceId: string }) {
+export function WorkspaceSearch({
+  workspaceId,
+  action,
+}: {
+  workspaceId: string;
+  action: ReactNode;
+}) {
   const t = useTranslations('search');
+  const hintId = useId();
   const [value, setValue] = useState('');
   const [queryText, setQueryText] = useState('');
 
@@ -28,15 +36,22 @@ export function WorkspaceSearch({ workspaceId }: { workspaceId: string }) {
 
   return (
     <div className="space-y-3">
-      <TextField
-        type="search"
-        label={t('title')}
-        maxLength={100}
-        value={value}
-        onChange={(event) => setValue(event.currentTarget.value)}
-        placeholder={t('placeholder')}
-        hint={t('hint')}
-      />
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          className="field-control min-w-0 flex-[1_1_14rem] border-control-border"
+          type="search"
+          aria-label={t('title')}
+          aria-describedby={hintId}
+          maxLength={100}
+          value={value}
+          onChange={(event) => setValue(event.currentTarget.value)}
+          placeholder={t('workspacePlaceholder')}
+        />
+        {action}
+      </div>
+      <p id={hintId} className="text-xs text-muted-foreground">
+        {t('hint')}
+      </p>
       {ready && query.isPending ? (
         <p role="status" className="text-sm text-muted-foreground">
           {t('loading')}
