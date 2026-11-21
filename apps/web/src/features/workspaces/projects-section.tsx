@@ -21,6 +21,7 @@ import {
   useDeleteBoard,
   useRenameBoard,
 } from './hooks';
+import { WorkspaceSearch } from './workspace-search';
 import { canManage } from './permissions';
 
 interface ProjectsSectionProps {
@@ -40,24 +41,27 @@ export function ProjectsSection({ groupId, role }: ProjectsSectionProps) {
     trigger.current?.focus();
   }
   return (
-    <section className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          {t('projects.title')}
-        </h2>
-        {manage && (
-          <button
-            type="button"
-            ref={trigger}
-            aria-expanded={creating}
-            onClick={() => (creating ? close() : setCreating(true))}
-            className="control-focus min-h-11 rounded-xl bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover"
-          >
-            <span aria-hidden="true">＋ </span>
-            {t('projects.new')}
-          </button>
-        )}
-      </div>
+    <section className="min-w-0 space-y-4">
+      <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+        {t('projects.title')}
+      </h2>
+      <WorkspaceSearch
+        workspaceId={groupId}
+        action={
+          manage && (
+            <button
+              type="button"
+              ref={trigger}
+              aria-expanded={creating}
+              onClick={() => (creating ? close() : setCreating(true))}
+              className="control-focus min-h-11 rounded-xl bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover"
+            >
+              <span aria-hidden="true">＋ </span>
+              {t('projects.new')}
+            </button>
+          )
+        }
+      />
       {manage && creating && <AddBoardForm groupId={groupId} close={close} />}
       <div>
         {boards.isPending ? (
