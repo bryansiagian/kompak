@@ -1,0 +1,4 @@
+﻿html:has(dialog[data-destructive-confirm][open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}

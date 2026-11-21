@@ -93,6 +93,7 @@
     "actionItems": "Tindak lanjut"
   },
   "search": {
+    "workspacePlaceholder": "Cari tugas dalam kelompok...",
     "title": "Cari tugas dalam kelompok",
     "placeholder": "Cari berdasarkan judul atau deskripsi tugas...",
     "hint": "Ketik minimal 2 karakter untuk mencari tugas.",
@@ -135,6 +136,7 @@
     "taskDetails": "Rincian tugas"
   },
   "common": {
+    "confirmGroupName": "Ketik nama kelompok persis seperti ini untuk mengonfirmasi: {name}",
     "loadError": {
       "temporary": {
         "title": "Belum bisa memuat halaman",
@@ -302,7 +304,14 @@
       "deleteConfirm": "Ya, hapus"
     },
     "members": {
-      "manage": "Kelola anggota",
+      "promote": "Jadikan {name} pengelola",
+      "demote": "Turunkan {name} menjadi anggota",
+      "removeTitle": "Keluarkan anggota?",
+      "removeBody": "Apakah kamu yakin ingin mengeluarkan {name} dari kelompok ini? Anggota tersebut akan kehilangan akses ke kelompok.",
+      "removeAction": "Keluarkan anggota",
+      "removing": "Mengeluarkan anggota...",
+      "removeMember": "Keluarkan {name} dari kelompok",
+      "rolePrompt": "{action}?",
       "title": "Anggota",
       "you": "(kamu)",
       "makeAdmin": "Jadikan Pengelola",
@@ -333,6 +342,9 @@
       "save": "Simpan nama",
       "saving": "Menyimpan…",
       "delete": "Hapus kelompok",
+      "deleteTitle": "Hapus kelompok {name}?",
+      "deleteBody": "Semua proyek dan data yang terkait akan ikut terhapus. Tindakan ini tidak dapat dibatalkan.",
+      "deleting": "Menghapus kelompok...",
       "deletePrompt": "Hapus kelompok ini? Semua proyek ikut terhapus dan tidak bisa dikembalikan.",
       "deleteConfirm": "Ya, hapus kelompok",
       "leave": "Keluar dari kelompok",
@@ -380,6 +392,8 @@
       "adding": "Menambahkan…"
     },
     "quickAdd": {
+      "new": "Tugas baru",
+      "destination": "Kolom tujuan",
       "open": "Tambah tugas",
       "label": "Judul tugas",
       "add": "Tambah",

@@ -49,7 +49,7 @@ export function ListColumn({
       id={`lane-${list.id}`}
       tabIndex={-1}
       aria-label={list.name}
-      className="control-focus w-[calc(100vw-4.5rem)] max-w-80 shrink-0 rounded-xl border border-divider bg-board-lane p-3 sm:w-76"
+      className="control-focus w-[calc(100vw-4.5rem)] max-w-[21rem] shrink-0 rounded-xl border border-divider bg-board-lane px-3 pb-1 pt-2 sm:w-80"
     >
       <ListHeader
         boardId={boardId}
@@ -60,12 +60,9 @@ export function ListColumn({
         onMove={onMoveList}
       />
 
-      <div className="mt-3">
-        <QuickAddCard boardId={boardId} listId={list.id} />
-      </div>
       <div
         ref={setNodeRef}
-        className={`mt-3 min-h-16 space-y-2 rounded-xl ${
+        className={`mt-2 min-h-16 space-y-2 rounded-xl ${
           isOver ? 'bg-brand-tint ring-2 ring-inset ring-primary' : ''
         }`}
       >
@@ -99,6 +96,7 @@ export function ListColumn({
           </p>
         ) : null}
       </div>
+      <QuickAddCard boardId={boardId} listId={list.id} />
     </section>
   );
 }

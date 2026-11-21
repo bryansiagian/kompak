@@ -13,7 +13,6 @@ import { InviteSection } from './invite-section';
 import { MembersSection } from './members-section';
 import { ProjectsSection } from './projects-section';
 import { RoleBadge } from './role-badge';
-import { WorkspaceSearch } from './workspace-search';
 
 export function GroupScreen({ groupId }: { groupId: string }) {
   return (
@@ -64,20 +63,9 @@ function GroupContent({ groupId, user }: { groupId: string; user: AuthUser }) {
           {data.name}
         </h1>
         <RoleBadge role={data.role} />
-        <a
-          href="#workspace-invitation"
-          className="control-focus inline-flex min-h-11 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover"
-        >
-          {design('inviteAction')}
-        </a>
       </header>
       <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-10">
-        <div className="min-w-0 space-y-6">
-          <ProjectsSection groupId={data.id} role={data.role} />
-          <div className="border-t border-divider pt-5">
-            <WorkspaceSearch workspaceId={data.id} />
-          </div>
-        </div>
+        <ProjectsSection groupId={data.id} role={data.role} />
         <aside className="min-w-0 space-y-5">
           <InviteSection workspace={data} />
           <MembersSection
