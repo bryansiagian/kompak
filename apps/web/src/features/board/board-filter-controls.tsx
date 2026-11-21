@@ -2,9 +2,7 @@
 
 import type { BoardDetail, Member } from '@kompak/shared';
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
 import { SelectField } from '@/components/ui/select-field';
-import { EMPTY_FILTERS, hasFilters } from './board-filters';
 import type { BoardFilters } from './board-filters';
 
 const dueOptions = ['all', 'overdue', 'today', 'week'] as const;
@@ -67,15 +65,6 @@ export function BoardFilterControls({
           options={dueOptions.map((value) => ({ value, label: t(value) }))}
         />
       </div>
-      <Button
-        variant="secondary"
-        aria-disabled={!hasFilters(filters)}
-        onClick={() => {
-          if (hasFilters(filters)) onChange(EMPTY_FILTERS);
-        }}
-      >
-        {t('clear')}
-      </Button>
     </section>
   );
 }
